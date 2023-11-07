@@ -1,0 +1,31 @@
+default:
+  version: 1.2
+  sample_size: 1000
+  gases: ['CO2', 'CH4', 'N2O']
+  year: '2015'
+  tolerance: 0.01 # used for all kind of tests, e.g. to test whether all leaves sum to a given aggregate
+  
+  default_sampling: 'norm' # other options: exp
+  default_cv: 0.3
+  
+  n_cores: 6 # number of cores (for multi-processing). set to one if you do want avoid multi processing
+  
+  path2CT_CRF_EXIOBASE: '~/Documents/Projects/Uncertainty_Extensions/code/UNFCCC_CRF_correspondence_tables/temp_results/correspondence_CRFdetailed_to_NACE_EXIOBASE_edited_v3-4.xlsx'
+  path2CT_CRF_EXIOBASE_parsed: '~/Documents/Projects/Uncertainty_Extensions/code/UNFCCC_CRF_correspondence_tables/intermediate_results/3_CT_coherent.RData'
+  path2CT_CRF_EDGAR_parsed: '/home/simon/Documents/Projects/Uncertainty_Extensions/code/UNFCCC_CRF_correspondence_tables/intermediate_results/CT_EDGAR_parsed.RData'
+  path2CT_NACE_EXIOBASE_parsed: '/home/simon/Documents/PhD_PROSET/data/Correspondence_tables/NACErev2_EXIOBASE_parsed.RData'
+  path2UNFCCC_emissions: '/home/simon/Documents/PhD_PROSET/data/UNFCCC/data-2020-10-25/data/annexI'
+  path2UNFCCC_uncertainty: '/home/simon/Documents/Projects/Uncertainty_Extensions/code/UNFCCC_extract_uncertainties/data/national-inventory-submissions-2017'
+  path2selin2021: '/home/simon/Documents/PhD_PROSET/data/Bridging_items/selin2021/erlabec02supp2.xlsx'
+  path2eurostat_bridging_items: '/home/simon/Documents/PhD_PROSET/data/Eurostat/bridging_items'
+  path2worldbank_air_transport: '/home/simon/Documents/PhD_PROSET/data/Worldbank/air_transport_passenger_carried/API_IS.AIR.PSGR_DS2_en_csv_v2_4756008'
+  path2edgar: '/home/simon/Documents/PhD_PROSET/data/EDGAR/V5.0'  
+  path2edgar_uncertainty: '/home/simon/Documents/PhD_PROSET/data/EDGAR/Uncertainties/tot_GHG_2015_Tier1_sector_countrytotal_cat_.csv'
+  path2exiobaseSUT: '/home/simon/Documents/PhD_PROSET/data/EXIOBASE3/V3.8.2/MRSUT_2015'
+  #path2exiobaseIOTpxp: '/home/simon/Documents/PhD_PROSET/data/EXIOBASE3/V3.8.2/IOT_2015_pxp'
+  path2exiobaseIOT: '/home/simon/Documents/PhD_PROSET/data/EXIOBASE3/V3.8.2/IOT_2015_ixi'
+  path2CountryMappingDESIRE: './data/CountryMappingDESIRE.xlsx'
+  colors: ["#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"]
+  ggtheme: "theme_bw()"
+test: 
+  sample_size: 100

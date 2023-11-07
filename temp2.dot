@@ -1,0 +1,104 @@
+digraph G {
+  graph[rankdir = TD]
+  node[shape=box]
+  create_CT_CRF_classification[label = "create_CT_CRF_classification", href = "0a_create_CT_CRF_classification.R"]
+  prepare_UNFCCC_CRF[label = "prepare_UNFCCC_CRF", href = "1a_prepare_UNFCCC_CRF.R"]
+  prepare_UNFCCC_uncertainty[label = "prepare_UNFCCC_uncertainty", href = "1b_prepare_UNFCCC_uncertainty.R"]
+  repair_CRF_categories[label = "repair_CRF_categories", href = "1c_repair_CRF_categories.R"]
+  merge_CRF_NIR_data[label = "merge_CRF_NIR_data", href = "2a_merge_CRF_NIR_data.R"]
+  sample_UNFCCC[label = "sample_UNFCCC", href = "2b_sample_UNFCCC.R"]
+  parse_EDGAR_emissions[label = "parse_EDGAR_emissions", href = "3a_parse_EDGAR_emissions.R"]
+  parse_EDGAR_uncertainty[label = "parse_EDGAR_uncertainty", href = "3b_parse_EDGAR_uncertainty.R"]
+  sample_EDGAR[label = "sample_EDGAR", href = "3c_sample_EDGAR.R"]
+  prepare_SUT_proxies[label = "prepare_SUT_proxies", href = "4a_prepare_SUT_proxies.R"]
+  residence_adjustment_SEA_prepare_data[label = "residence_adjustment_SEA_prepare_data", href = "4a_residence_adjustment_SEA_prepare_data.R"]
+  prepare_PEFA_proxies[label = "prepare_PEFA_proxies", href = "4b_prepare_PEFA_proxies.R"]
+  prepare_EMPLOYMENT_proxies[label = "prepare_EMPLOYMENT_proxies", href = "prepare_EMPLOYMENT_proxies.R"]
+  prepare_ROAD_TRANSPORT_proxies[label = "prepare_ROAD_TRANSPORT_proxies", href = "prepare_ROAD_TRANSPORT_proxies.R"]
+  residence_adjustment_SEA_sample[label = "residence_adjustment_SEA_sample", href = "4b_residence_adjustment_SEA_sample.R"]
+  residence_adjustment_AIR_prepare[label = "residence_adjustment_AIR_prepare", href = "4c_residence_adjustment_AIR_prepare.R"]
+  residence_adjustment_AIR_sample[label = "residence_adjustment_AIR_sample", href = "4d_residence_adjustment_AIR_sample.R"]
+  residence_adjustment_ROAD_prepare[label = "residence_adjustment_ROAD_prepare", href = "4e_residence_adjustment_ROAD_prepare.R"]
+  residence_adjustment_ROAD_sample[label = "residence_adjustment_ROAD_sample", href = "4f_residence_adjustment_ROAD_sample.R"]
+  UNFCCC_get_EXIOBASE_proxies[label = "UNFCCC_get_EXIOBASE_proxies", href = "5a_UNFCCC_get_EXIOBASE_proxies.R"]
+  sample_EXIOBASE[label = "sample_EXIOBASE", href = "5c_sample_EXIOBASE.R"]
+  prepare_EXIOBASE_samples[label = "prepare_EXIOBASE_samples", href = "prepare_EXIOBASE_samples.R"]
+  allocate_to_EB_regions[label = "allocate_to_EB_regions", href="allocate_countries_to_EB_regions.R"] 
+  convert_to_matrix[label = "convert_to_matrix", href = "5d_convert_to_matrix.R"]
+  
+  prepare_EXIOBASE[label= "prepare_EXIOBASE", href = "prepare_EXIOBASE.R"]
+  
+  calculate_footprints[label = "calculate_footprints", href = "6_calculate_footprints.R"]
+  analyse_footprints[label = "analyse_footprints", href = "analyse_footprints.R"]
+  
+  
+  EDGAR_get_proxies[label = "EDGAR_get_proxies", href = "6a_EDGAR_get_proxies.R"]
+  combine_UNFCCC_EDGAR_samples[label = "combine_UNFCCC_EDGAR_samples", href = "7_combine_UNFCCC_EDGAR_samples.R"]
+  analyse_extensions[label = "analyse_extensions", href = "7a_analyse_extensions.R"]
+  run_optimizer[label = "run_optimizer", href = "7b_run_optimizer.R"]
+  color_palette_playground[label = "color_palette_playground", href = "color_palette_playground.R"]
+  compare_uncertainties_UNFCCC_EDGAR[label = "compare_uncertainties_UNFCCC_EDGAR", href = "compare_uncertainties_UNFCCC_EDGAR.R"]
+  differentiate_dirichlet_entropy[label = "differentiate_dirichlet_entropy", href = "differentiate_dirichlet_entropy.R"]
+  maxent_lognormal[label = "maxent_lognormal", href = "maxent_lognormal.R"]
+  playground_lenzen[label = "playground_lenzen", href = "playground_lenzen.R"]
+  reference_UNFCCC[label = "reference_UNFCCC", href = "reference_UNFCCC.R"]
+  submit_copernicus[label = "submit_copernicus", href = "submit_copernicus.R"]
+  trackdown_workflow[label = "trackdown_workflow", href = "trackdown_workflow.R"]
+  UNFCCC_category_explorer[label = "UNFCCC_category_explorer", href = "UNFCCC_category_explorer.R"]
+  
+  
+  
+  
+  edge[]
+  create_CT_CRF_classification -> prepare_UNFCCC_CRF
+  create_CT_CRF_classification -> prepare_UNFCCC_uncertainty
+  prepare_UNFCCC_CRF -> repair_CRF_categories
+  prepare_UNFCCC_uncertainty -> repair_CRF_categories
+  repair_CRF_categories -> merge_CRF_NIR_data
+  prepare_UNFCCC_uncertainty -> merge_CRF_NIR_data
+  create_CT_CRF_classification -> merge_CRF_NIR_data
+  merge_CRF_NIR_data -> sample_UNFCCC
+  parse_EDGAR_emissions -> parse_EDGAR_uncertainty
+  parse_EDGAR_emissions -> sample_EDGAR
+  parse_EDGAR_uncertainty -> sample_EDGAR
+  prepare_PEFA_proxies -> prepare_EMPLOYMENT_proxies
+  prepare_EMPLOYMENT_proxies -> prepare_ROAD_TRANSPORT_proxies
+  prepare_PEFA_proxies -> prepare_ROAD_TRANSPORT_proxies
+  
+  
+  prepare_SUT_proxies -> UNFCCC_get_EXIOBASE_proxies 
+  prepare_ROAD_TRANSPORT_proxies -> UNFCCC_get_EXIOBASE_proxies 
+  sample_UNFCCC -> UNFCCC_get_EXIOBASE_proxies
+  sample_EDGAR -> EDGAR_get_proxies
+  prepare_SUT_proxies -> EDGAR_get_proxies
+  prepare_ROAD_TRANSPORT_proxies -> EDGAR_get_proxies
+  EDGAR_get_proxies -> combine_UNFCCC_EDGAR_samples
+  UNFCCC_get_EXIOBASE_proxies -> combine_UNFCCC_EDGAR_samples
+  
+  
+  residence_adjustment_SEA_prepare_data -> residence_adjustment_SEA_sample
+  parse_EDGAR_emissions -> residence_adjustment_SEA_sample
+  parse_EDGAR_uncertainty -> residence_adjustment_SEA_sample
+  residence_adjustment_SEA_sample -> combine_UNFCCC_EDGAR_samples
+  
+  residence_adjustment_AIR_prepare -> residence_adjustment_AIR_sample
+  parse_EDGAR_emissions -> residence_adjustment_AIR_sample
+  parse_EDGAR_uncertainty -> residence_adjustment_AIR_sample
+  residence_adjustment_AIR_sample -> combine_UNFCCC_EDGAR_samples
+  
+  residence_adjustment_ROAD_prepare -> residence_adjustment_ROAD_sample
+  combine_UNFCCC_EDGAR_samples -> residence_adjustment_ROAD_sample
+  
+  residence_adjustment_ROAD_sample -> run_optimizer
+  run_optimizer -> sample_EXIOBASE
+  sample_EXIOBASE -> prepare_EXIOBASE_samples
+  prepare_EXIOBASE_samples -> convert_to_matrix
+  prepare_EXIOBASE -> calculate_footprints
+  
+  convert_to_matrix -> calculate_footprints
+  prepare_EXIOBASE_samples -> analyse_extensions
+  prepare_EXIOBASE -> analyse_extensions
+  prepare_EXIOBASE -> analyse_footprints
+  calculate_footprints -> analyse_footprints
+  
+} 

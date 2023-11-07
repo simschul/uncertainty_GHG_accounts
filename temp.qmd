@@ -1,0 +1,99 @@
+---
+title: "temp"
+format: html
+editor: visual
+---
+
+## Quarto
+
+
+```{dot}
+digraph G {
+  graph[rankdir = TD]
+  node[shape=box]
+1a_create_CT_CRF_classification[label = "1a_create_CT_CRF_classification", href = "1a_create_CT_CRF_classification.R"]
+ 1b_prepare_UNFCCC_CRF[label = "1b_prepare_UNFCCC_CRF", href = "1b_prepare_UNFCCC_CRF.R"]
+ 1c_prepare_UNFCCC_uncertainty[label = "1c_prepare_UNFCCC_uncertainty", href = "1c_prepare_UNFCCC_uncertainty.R"]
+ 1d_repair_CRF_categories[label = "1d_repair_CRF_categories", href = "1d_repair_CRF_categories.R"]
+ 1e_merge_CRF_NIR_data[label = "1e_merge_CRF_NIR_data", href = "1e_merge_CRF_NIR_data.R"]
+ 1f_sample_UNFCCC[label = "1f_sample_UNFCCC", href = "1f_sample_UNFCCC.R"]
+ 2a_parse_EDGAR_emissions[label = "2a_parse_EDGAR_emissions", href = "2a_parse_EDGAR_emissions.R"]
+ 2b_parse_EDGAR_uncertainty[label = "2b_parse_EDGAR_uncertainty", href = "2b_parse_EDGAR_uncertainty.R"]
+ 2c_sample_EDGAR[label = "2c_sample_EDGAR", href = "2c_sample_EDGAR.R"]
+ 3a_prepare_SUT_proxies[label = "3a_prepare_SUT_proxies", href = "3a_prepare_SUT_proxies.R"]
+ 3b_prepare_PEFA_proxies[label = "3b_prepare_PEFA_proxies", href = "3b_prepare_PEFA_proxies.R"]
+ 3c_prepare_EMPLOYMENT_proxies[label = "3c_prepare_EMPLOYMENT_proxies", href = "3c_prepare_EMPLOYMENT_proxies.R"]
+ 3d_prepare_ROAD_TRANSPORT_proxies[label = "3d_prepare_ROAD_TRANSPORT_proxies", href = "3d_prepare_ROAD_TRANSPORT_proxies.R"]
+ 4a_residence_adjustment_SEA_prepare_data[label = "4a_residence_adjustment_SEA_prepare_data", href = "4a_residence_adjustment_SEA_prepare_data.R"]
+ 4b_residence_adjustment_SEA_sample[label = "4b_residence_adjustment_SEA_sample", href = "4b_residence_adjustment_SEA_sample.R"]
+ 4c_residence_adjustment_AIR_prepare[label = "4c_residence_adjustment_AIR_prepare", href = "4c_residence_adjustment_AIR_prepare.R"]
+ 4d_residence_adjustment_AIR_sample[label = "4d_residence_adjustment_AIR_sample", href = "4d_residence_adjustment_AIR_sample.R"]
+ 4e_residence_adjustment_ROAD_prepare[label = "4e_residence_adjustment_ROAD_prepare", href = "4e_residence_adjustment_ROAD_prepare.R"]
+ 5a_UNFCCC_get_EXIOBASE_proxies[label = "5a_UNFCCC_get_EXIOBASE_proxies", href = "5a_UNFCCC_get_EXIOBASE_proxies.R"]
+ 5b_EDGAR_get_proxies[label = "5b_EDGAR_get_proxies", href = "5b_EDGAR_get_proxies.R"]
+ 6a_combine_UNFCCC_EDGAR_samples[label = "6a_combine_UNFCCC_EDGAR_samples", href = "6a_combine_UNFCCC_EDGAR_samples.R"]
+ 6b_residence_adjustment_ROAD_sample[label = "6b_residence_adjustment_ROAD_sample", href = "6b_residence_adjustment_ROAD_sample.R"]
+ 6c_run_optimizer[label = "6c_run_optimizer", href = "6c_run_optimizer.R"]
+ 6d_sample_EXIOBASE[label = "6d_sample_EXIOBASE", href = "6d_sample_EXIOBASE.R"]
+ 6e_prepare_EXIOBASE_samples[label = "6e_prepare_EXIOBASE_samples", href = "6e_prepare_EXIOBASE_samples.R"]
+ 6f_convert_to_matrix[label = "6f_convert_to_matrix", href = "6f_convert_to_matrix.R"]
+ 7_prepare_EXIOBASE[label = "7_prepare_EXIOBASE", href = "7_prepare_EXIOBASE.R"]
+ 8_calculate_footprints[label = "8_calculate_footprints", href = "8_calculate_footprints.R"]
+ 9_plot_results[label = "9_plot_results", href = "9_plot_results.R"]
+ 
+  
+  
+  
+  
+  edge[]
+  1a_create_CT_CRF_classification -> 1b_prepare_UNFCCC_CRF
+  1a_create_CT_CRF_classification -> 1c_prepare_UNFCCC_uncertainty
+  1b_prepare_UNFCCC_CRF -> 1d_repair_CRF_categories
+  1c_prepare_UNFCCC_uncertainty -> 1d_repair_CRF_categories
+  1d_repair_CRF_categories -> 1e_merge_CRF_NIR_data
+  1c_prepare_UNFCCC_uncertainty -> 1e_merge_CRF_NIR_data
+  1a_create_CT_CRF_classification -> 1e_merge_CRF_NIR_data
+  1e_merge_CRF_NIR_data -> 1f_sample_UNFCCC
+  2a_parse_EDGAR_emissions -> 2b_parse_EDGAR_uncertainty
+  2a_parse_EDGAR_emissions -> 2c_sample_EDGAR
+  2b_parse_EDGAR_uncertainty -> 2c_sample_EDGAR
+  3b_prepare_PEFA_proxies -> 3c_prepare_EMPLOYMENT_proxies
+  3c_prepare_EMPLOYMENT_proxies -> 3d_prepare_ROAD_TRANSPORT_proxies
+  3b_prepare_PEFA_proxies -> 3d_prepare_ROAD_TRANSPORT_proxies
+  
+  
+  3a_prepare_SUT_proxies -> 5a_UNFCCC_get_EXIOBASE_proxies 
+  3d_prepare_ROAD_TRANSPORT_proxies -> 5a_UNFCCC_get_EXIOBASE_proxies 
+  1f_sample_UNFCCC -> 5a_UNFCCC_get_EXIOBASE_proxies
+  2c_sample_EDGAR -> 5b_EDGAR_get_proxies
+  3a_prepare_SUT_proxies -> 5b_EDGAR_get_proxies
+  3d_prepare_ROAD_TRANSPORT_proxies -> 5b_EDGAR_get_proxies
+  5b_EDGAR_get_proxies -> 6a_combine_UNFCCC_EDGAR_samples
+  5a_UNFCCC_get_EXIOBASE_proxies -> 6a_combine_UNFCCC_EDGAR_samples
+  
+  
+  4a_residence_adjustment_SEA_prepare_data -> 4b_residence_adjustment_SEA_sample
+  2a_parse_EDGAR_emissions -> 4b_residence_adjustment_SEA_sample
+  2b_parse_EDGAR_uncertainty -> 4b_residence_adjustment_SEA_sample
+  4b_residence_adjustment_SEA_sample -> 6a_combine_UNFCCC_EDGAR_samples
+  
+  4c_residence_adjustment_AIR_prepare -> 4d_residence_adjustment_AIR_sample
+  2a_parse_EDGAR_emissions -> 4d_residence_adjustment_AIR_sample
+  2b_parse_EDGAR_uncertainty -> 4d_residence_adjustment_AIR_sample
+  4d_residence_adjustment_AIR_sample -> 6a_combine_UNFCCC_EDGAR_samples
+  
+  4e_residence_adjustment_ROAD_prepare -> 6b_residence_adjustment_ROAD_sample
+  6a_combine_UNFCCC_EDGAR_samples -> 6b_residence_adjustment_ROAD_sample
+  
+  6b_residence_adjustment_ROAD_sample -> 6c_run_optimizer
+  6c_run_optimizer -> 6d_sample_EXIOBASE
+  6d_sample_EXIOBASE -> 6e_prepare_EXIOBASE_samples
+  6e_prepare_EXIOBASE_samples -> 6f_convert_to_matrix
+  7_prepare_EXIOBASE -> 8_calculate_footprints
+  
+  6f_convert_to_matrix -> 8_calculate_footprints
+  6e_prepare_EXIOBASE_samples -> 9_plot_results
+  8_calculate_footprints -> 9_plot_results
+  
+} 
+```
