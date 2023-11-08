@@ -17,8 +17,8 @@ Once published the study will be linked here.
 To reproduce the results and run the scripts you need to download the
 following data:
 
-- From EXIOBASE V3.8.2 `IOT_2015_ixi.zip` and `MRSUT_2015.zip` from
-  here: <https://zenodo.org/records/5589597>
+- EXIOBASE V3.8.2 `IOT_2015_ixi.zip` and `MRSUT_2015.zip` from here:
+  <https://zenodo.org/records/5589597>
 - UNFCCC country-submitted greenhouse gas emissions data until
   2020-10-25 from here: <https://zenodo.org/record/4199622>
 - EDGAR v5.0 time series data for CO$_2$, CH$_4$ and N$_2$O from here:
@@ -31,8 +31,10 @@ following data:
   <https://doi.org/10.1088/1748-9326/abec02> (The link to the file is a
   bit hidden below the abstract)
 
-The uncertainty data from Solazzo et al. (2021) is already part of this
-repository (`./data/tot_GHG_2015_Tier1_sector_countrytotal_cat_.csv`).
+The uncertainty data from Solazzo et al. (2021)
+(<https://acp.copernicus.org/articles/21/5655/2021/>) is already part of
+this repository
+(`./data/tot_GHG_2015_Tier1_sector_countrytotal_cat_.csv`).
 
 ## How to run the scripts
 
@@ -46,8 +48,8 @@ as follows:
     the more RAM you require).
 
 The version number determines where the intermediate results are stored.
-This means a subfolder under `./intermediate_results` is created when
-you run the scripts the first time with a give version number. Running
+This means when you run the scripts the first time with a give version
+number a sub-folder under `./intermediate_results` is created. Running
 the scripts again with the same version number overwrites the results.
 
 The scripts need to be run according to the order indicated. The

@@ -19,6 +19,7 @@ library(ggforce)
 library(mRio)
 library(logr)
 library(testthat)
+library(arrow)
 
 ############################################################################## # 
 ##### settings #################################################################
@@ -91,8 +92,8 @@ proxies_secondary <- dt[, list(proxies_empl = list(data.table(
 # _b) employment as primary proxy (to also split industries/houyseholds) =========
 
 # load mean industry/household split accross all EU countries from PEFA 
-mean_split <- readRDS(file.path(path2output, 
-                                'prepare_PEFA_proxies_mean_ind-hous_split.RData'))
+mean_split <- read_feather(file.path(path2output, 
+                                'prepare_PEFA_proxies_mean_ind-hous_split.feather'))
 
 dt[, CO2 := mean_split[gas == 'CO2' & type == 'industry']$share]
 dt[, CH4 := mean_split[gas == 'CH4' & type == 'industry']$share]
@@ -129,8 +130,8 @@ proxies_primary <- proxies_primary[, list(proxies_empl = list(data.table(
 ############################################################################## # 
 ##### save results #############################################################
 ############################################################################## # 
-save_results(proxies_secondary, suffix = '_secondary')
-save_results(proxies_primary, suffix = '_primary')
+save_results(proxies_secondary, suffix = '_secondary', type = '.feather')
+save_results(proxies_primary, suffix = '_primary', type = '.feather')
 
 # THE END ---------------------------------------------------------------------
 

@@ -146,8 +146,8 @@ use2 <- use2[, list(value = sum(value)),
 
 
 # save results =================================================================
-save_results(supply, suffix = '_supply')
-save_results(use2, suffix = '_use')
+save_results(supply, type = '.feather', suffix = '_supply')
+save_results(use2, type = '.feather', suffix = '_use')
 
 
 # THE END ---------------------------------------------------------------------

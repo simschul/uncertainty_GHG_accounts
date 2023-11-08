@@ -33,8 +33,8 @@ path2unfccc <- file.path(path2output, "UNFCCC_get_EXIOBASE_proxies.RData")
 path2edgar <- file.path(path2output, "EDGAR_get_proxies.RData")
 
 # paths to residence adjustments
-path2sea <- file.path(path2output, 'residence_adjustment_SEA_sample.RData')
-path2air <- file.path(path2output, 'residence_adjustment_AIR_sample.RData')
+path2sea <- file.path(path2output, 'residence_adjustment_SEA_sample.feather')
+path2air <- file.path(path2output, 'residence_adjustment_AIR_sample.feather')
 # path2unfccc <- './temp_results/5a_UNFCCC_samples_with_EXIOBASE_proxies.RData'
 # path2edgar <- './temp_results/6a_EDGAR_samples_with_EXIOBASE_proxies.RData'
  
@@ -51,13 +51,18 @@ path2air <- file.path(path2output, 'residence_adjustment_AIR_sample.RData')
 data_list <- list()
 data_list$unfccc <- readRDS(path2unfccc)
 data_list$edgar <- readRDS(path2edgar)
-data_list$res_adj_SEA <- readRDS(path2sea)
-data_list$res_adj_AIR <- readRDS(path2air)
+data_list$res_adj_SEA <-  read_feather(path2sea)
+data_list$res_adj_AIR <- read_feather(path2air)
+
+
 
 # Prepare before merge
+data_list$res_adj_SEA[, sample := as.list(sample)]
+data_list$res_adj_AIR[, sample := as.list(sample)]
 setnames(data_list$unfccc, 
          c('party', 'emissions_CRF', 'sd_CRF'), 
          c('country_code', 'emissions', 'sd'))
+
 
 data_list$edgar[, classification := 'total_for_category']
 data_list$res_adj_AIR[, classification := 'total_for_category']

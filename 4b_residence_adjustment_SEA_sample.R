@@ -18,7 +18,7 @@ library(units)
 library(ggforce)
 library(truncnorm)
 library(testthat)
-
+library(arrow)
 
 ############################################################################## # 
 ##### functions #################################################################
@@ -36,7 +36,7 @@ config <- setup_config_and_log()
 path2output <- config$path2output
 
 
-path2shares <- file.path(path2output, 'residence_adjustment_SEA_prepare_data.RData')
+path2shares <- file.path(path2output, 'residence_adjustment_SEA_prepare_data.feather')
 path2edgar <- file.path(path2output, 'parse_EDGAR_emissions2015_parsed.RData')
 path2edgar_un <- file.path(path2output, 'parse_EDGAR_uncertainty.RData') 
 
@@ -102,7 +102,7 @@ agg_samples <- data[, list(sample_agg = sum_samples(sample)), by = gas]
 
 # _a) load data ===============================================================
 # Country specific use shares (based on operating country) from Selin 2021
-country_shares <- readRDS(path2shares)
+country_shares <- read_feather(path2shares)
 country_shares <- country_shares[share != 0]
 country_shares[, sum(share)]
 
@@ -213,7 +213,7 @@ test_that('all good', {
 ############################################################################## # 
 ##### save results #############################################################
 ############################################################################## # 
-save_results(samples_dt2)
+save_results(samples_dt2, type = '.feather')
 
 
 # # begin old ==========================

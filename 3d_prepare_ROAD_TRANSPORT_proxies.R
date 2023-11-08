@@ -20,6 +20,7 @@ library(mRio)
 library(logr)
 library(countrycode)
 library(testthat)
+library(arrow)
 ############################################################################## # 
 ##### settings #################################################################
 ############################################################################## # 
@@ -54,8 +55,8 @@ source('./src/functions_eurostat.R')
 # all EU countries where first allocation based on PEFA, then on EMPL
 
 
-empl <- readRDS(file.path(path2output, 'prepare_EMPLOYMENT_proxies_secondary.RData'))
-pefa <- readRDS(file.path(path2output, 'prepare_PEFA_proxies.RData'))
+empl <- read_feather(file.path(path2output, 'prepare_EMPLOYMENT_proxies_secondary.feather'))
+pefa <- read_feather(file.path(path2output, 'prepare_PEFA_proxies.feather'))
 
 empl <- as.data.table(unnest(empl, proxies_empl))
 pefa <- as.data.table(unnest(pefa, proxies))
@@ -160,7 +161,8 @@ dt2 <- dt2[, list(proxies_pefa_empl = list(data.table(
 ##### 2. Employment only #############################################################
 ############################################################################## # 
 # all non-EU countries where allocation based on EMPL only
-empl_primary <- readRDS(file.path(path2output, 'prepare_EMPLOYMENT_proxies_primary.RData'))
+empl_primary <- read_feather(file.path(path2output, 'prepare_EMPLOYMENT_proxies_primary.feather'))
+empl_primary[, proxies_empl := lapply(proxies_empl, as.data.table)]
 
 # Combine both
 #dt_comb <- rbindlist(list('pefa' = dt2, 'nonpefa' = empl_primary), fill = TRUE)
@@ -179,6 +181,6 @@ test_that("proxy data for 49 regions available", {
 ############################################################################## # 
 ##### save results #############################################################
 ############################################################################## # 
-save_results(dt_comb[, .(region, gas, proxies)])
+save_results(dt_comb[, .(region, gas, proxies)], type = '.feather')
 
 # THE END ---------------------------------------------------------------------

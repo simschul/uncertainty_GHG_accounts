@@ -126,57 +126,57 @@ rm(dt4)
 gc()
 
 # save as sparse matrix in dt format
-save_results(dt5, type = '.feather')
+save_results(dt5, type = '.feather', suffix = '_sparse')
 
 
 # 
-# as_dense_matrix_list <- function(x, nrow, ncol, N) {
-#   
-#   array <- array(NA, dim = c(nrow, ncol ,N))
-#   #list <- vector('list', N)
-#   #list <- lapply(1:N, function(x) matrix(0, nrow = nrow, ncol = ncol))
-#   # TODO: make more efficient, avoid for loop
-#   for (i in 1:nrow(x)) {
-#     #list    
-#     array[x[i,]$row, x[i,]$col, ] <- unlist(x[i]$sample)
-#   }
-#   return(array)
-# }
-# 
-# Fmat_list <- as_dense_matrix_list(dt5, nrow = dt5$row %>% unique %>% length, 
-#                                   ncol = 7987, 
-#                                   N = config$sample_size)
-# 
-# rm(dt5)
-# gc()
-# 
-# dim(Fmat_list)
-# 
-# # convert to data.table
-# #Fmat_dt <- as.data.table(Fmat_list)
-# 
-# #Fmat_list[1:10, 1:10, 1:100] 
-# 
-# Fmat_list[1,,][is.na(Fmat_list[1,,])]
-# for (i in 1:dim(Fmat_list)[1]) {
-#   cat(i, '')
-#   Fmat_list[i,,][is.na(Fmat_list[i,,])] <- 0
-#   gc()
-# }
-# 
-# #Fmat_list[is.na(Fmat_list)] <- 0
-# 
-# Fmat_list2 <- plyr::alply(Fmat_list, 3)
-# (Fmat_list2$`1`)[1:3, 1:10]
-# 
-# Fmat_list2[[1]] %>% 
-#   rowSums()
+as_dense_matrix_list <- function(x, nrow, ncol, N) {
+
+  array <- array(NA, dim = c(nrow, ncol ,N))
+  #list <- vector('list', N)
+  #list <- lapply(1:N, function(x) matrix(0, nrow = nrow, ncol = ncol))
+  # TODO: make more efficient, avoid for loop
+  for (i in 1:nrow(x)) {
+    #list
+    array[x[i,]$row, x[i,]$col, ] <- unlist(x[i]$sample)
+  }
+  return(array)
+}
+
+Fmat_list <- as_dense_matrix_list(dt5, nrow = dt5$row %>% unique %>% length,
+                                  ncol = 7987,
+                                  N = config$sample_size)
+
+rm(dt5)
+gc()
+
+dim(Fmat_list)
+
+# convert to data.table
+#Fmat_dt <- as.data.table(Fmat_list)
+
+#Fmat_list[1:10, 1:10, 1:100]
+
+#Fmat_list[1,,][is.na(Fmat_list[1,,])]
+for (i in 1:dim(Fmat_list)[1]) {
+  cat(i, '')
+  Fmat_list[i,,][is.na(Fmat_list[i,,])] <- 0
+  gc()
+}
+
+Fmat_list[is.na(Fmat_list)] <- 0
+
+Fmat_list2 <- plyr::alply(Fmat_list, 3)
+(Fmat_list2$`1`)[1:3, 1:10]
+
+Fmat_list2[[1]] %>%
+  rowSums()
 # 
 # 
 # ############################################################################## # 
 # ##### save results #############################################################
 # ############################################################################## # 
-# save_results(Fmat_list2)
+save_results(Fmat_list2)
 save_results(row_ids, suffix = '_rownames')
 #save_results_xlsx(Fmat_list2)
 

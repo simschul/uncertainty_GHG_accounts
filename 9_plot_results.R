@@ -27,6 +27,7 @@ library(cowplot)
 library(kableExtra)
 library(egg)
 library(stringr)
+library(arrow)
 
 ############################################################################## # 
 ##### load functions #################################################################
@@ -61,7 +62,7 @@ theme_simschul <- function(){
     
     theme(
       strip.background  = element_rect(fill = 'grey90', colour = NA)
-      
+
     )
 }
 theme_set(theme_simschul())
@@ -96,7 +97,7 @@ meta <- mRio::parse_EB3_metadata(config$path2exiobaseIOT)
 # 1. GEA by industry ===========================================================
 
 # loadign the data
-gea_by_ind <- readRDS(file.path(path2results, 'prepare_EXIOBASE_samples_by_industry.RData'))
+gea_by_ind <- read_feather(file.path(path2results, 'prepare_EXIOBASE_samples_by_industry.feather'))
 
 threshold <- 1E-6
 
@@ -107,7 +108,7 @@ gea_by_ind[mean_rel > threshold, rank_cv := frankv((CI97.5 - CI2.5) / mean,
 gea_by_ind[rank_cv < 10, label := paste0(EB_region, ': ', industry_code)]
 
 # merge with exiobase data
-exio_gea <- readRDS(file.path(path2results, 'prepare_EXIOBASE_gea.RData'))
+exio_gea <- read_feather(file.path(path2results, 'prepare_EXIOBASE_gea.feather'))
 setnames(exio_gea, 'value', 'value_exio')
 
 gea_by_ind <- merge(gea_by_ind, exio_gea, by = c('gas', 'EB_region', 'industry_code'))
@@ -126,7 +127,7 @@ gea_by_ind[, type := factor(type, levels = c('above', 'within', 'below'))]
 # 2. GEA by region =============================================================
 
 # loadign the data
-gea_by_reg <- readRDS(file.path(path2results, 'prepare_EXIOBASE_samples_by_region.RData'))
+gea_by_reg <- read_feather(file.path(path2results, 'prepare_EXIOBASE_samples_by_region.feather'))
 
 # create labels
 gea_by_reg[, rank_ci := frankv((CI97.5 - CI2.5) / mean, order = -1L), by = gas]
@@ -137,7 +138,7 @@ gea_by_reg[, rank_mean := frankv(mean, order = -1L), by = gas]
 #gea_by_reg[rank_cv < 5 | rank_mean < 5, label := EB_region]
 
 # merge with exiobase data
-exio_by_reg <- readRDS(file.path(path2results, 'prepare_EXIOBASE_gea_by_reg.RData'))
+exio_by_reg <- read_feather(file.path(path2results, 'prepare_EXIOBASE_gea_by_reg.feather'))
 setnames(exio_by_reg, 'value', 'value_exio')
 
 gea_by_reg <- merge(gea_by_reg, exio_by_reg, by = c('gas', 'EB_region'))
@@ -179,9 +180,8 @@ gea_by_reg[, type_oecd := factor(type_oecd, levels = c('above', 'within', 'below
 
 # 3. GEA by source category =====================================================
 # loadign the data
-gea_by_crf <- readRDS(file.path(path2results, 'prepare_EXIOBASE_samples_by_industry_and_CRF.RData'))
-
-gea_by_reg_crf <- readRDS(file.path(path2results, 'prepare_EXIOBASE_samples_by_region_and_CRF.RData'))
+gea_by_crf <- read_feather(file.path(path2results, 'prepare_EXIOBASE_samples_by_industry_and_CRF.feather'))
+gea_by_reg_crf <- read_feather(file.path(path2results, 'prepare_EXIOBASE_samples_by_region_and_CRF.feather'))
 
 gea_by_reg_crf[, sd_by_reg_crf := sd / sum(sd), 
                by = .(gas, EB_region)]
@@ -199,10 +199,9 @@ gea_by_reg_crf$sobol_index %>% summary
 
 
 # 4. Footprint by region =======================================================
-fp_by_reg <- readRDS(file.path(path2results, 'calculate_footprints_national.RData'))
-setnames(fp_by_reg, 'region', 'EB_region')
+fp_by_reg <- read_feather(file.path(path2results, 'prepare_footprints_by_region.feather'))
 
-exio_fp_by_reg <- readRDS(file.path(path2results, 'prepare_EXIOBASE_fp_national.RData'))
+exio_fp_by_reg <- read_feather(file.path(path2results, 'prepare_EXIOBASE_fp_national.feather'))
 setnames(exio_fp_by_reg, 'value', 'value_exio')
 
 fp_by_reg <- merge(fp_by_reg, exio_fp_by_reg, by = c('gas', 'EB_region'))
@@ -216,23 +215,25 @@ full_by_reg <- rbindlist(list('gea' = gea_by_reg,
 
 
 # 6. Footprint multiplier ======================================================
-fp_multiplier <- readRDS(file.path(path2results, 'calculate_footprints_multiplier.RData'))
+fp_multiplier <- read_feather(file.path(path2results, 'prepare_footprints_by_sector.feather'))
+setnames(fp_multiplier, 'j', 'id')
+
 
 exio_Y <- readRDS(file.path(path2results, 'prepare_EXIOBASE_Y.RData'))
 exio_Y <- data.table(id = 1:nrow(exio_Y), 
                      final_demand = rowSums(exio_Y))
 
-fp_multiplier[, id := id - 2]
+#fp_multiplier[, id := id - 2]
 
-sector_names <- merge(meta$indices_A$colnames[, id := 1:.N], meta$industries[, .(Name, CodeNr)], 
-                      by.x = 'sector', by.y = 'Name', sort = FALSE)
-setnames(sector_names, 
-         c('region', 'sector', 'CodeNr'), 
-         c('EB_region', 'industry_name', 'industry_code'))
-
-
-fp_multiplier <- merge(fp_multiplier, sector_names,
-                       by = 'id', sort = FALSE)
+# sector_names <- merge(meta$indices_A$colnames[, id := 1:.N], meta$industries[, .(Name, CodeNr)], 
+#                       by.x = 'sector', by.y = 'Name', sort = FALSE)
+# setnames(sector_names, 
+#          c('region', 'sector', 'CodeNr'), 
+#          c('EB_region', 'industry_name', 'industry_code'))
+# 
+# 
+# fp_multiplier <- merge(fp_multiplier, sector_names,
+#                        by = 'id', sort = FALSE)
 
 fp_multiplier <- merge(fp_multiplier, exio_Y, by = 'id', sort = FALSE)
 
@@ -246,7 +247,6 @@ fp_multiplier[total_emissions_share > 0.001, label := id]
 fp_multiplier <- fp_multiplier[final_demand > 0]
 
 # 7. GEA + FP by industry =====================================================
-
 gea_by_ind3 <- gea_by_ind[, .(gas, EB_region, industry_code, mean, 
                               cv, mean_rel)]
 fp_multiplier3 <- fp_multiplier[, .(gas, EB_region, industry_code, 
@@ -264,158 +264,158 @@ full_by_ind <- full_by_ind[is.finite(cv) & cv >= 0]
 
 # 8. UNFCCC and EDGAR inventory ===================================================
 
-unfccc <- readRDS(file.path(path2results, 'merge_CRF_NIR_data.RData'))
-edgar <- readRDS(file.path(path2results, 'parse_EDGAR_uncertainty.RData'))
-
-unfccc$cv_NIR %>% summary
-unfccc[cv_NIR < 0.001]
-
-library(ggpmisc)
-
-
-ggplot(unfccc[cv_NIR>0], aes(x= emissions_CRF, y = cv_NIR, col = party)) + 
-  geom_point(alpha = 0.3, shape = 16) + 
-  geom_smooth(aes(group = party), method = 'glm', se = FALSE) + 
-#  geom_smooth(method = 'nls', formula = y ~ a * x^b, start = list(a=1,b=2),se=FALSE) + 
- # geom_smooth(method="glm", aes(color="Exp Model"), formula= (y ~ exp(x)), 
-#              se=TRUE, linetype = 1) +
-  scale_x_log10() + 
-  scale_y_log10() + 
-  scale_color_viridis_d() + 
-  theme(legend.position = 'none') + 
-  facet_wrap(~gas, scales = 'free') 
-
-ggplot(edgar[cv>0], aes(x= emissions_solazzo, y = cv, col = country_code)) + 
-  geom_point(alpha = 0.3, shape = 16) + 
-  geom_smooth(method = 'glm', se = FALSE) + 
-  #  geom_smooth(method = 'nls', formula = y ~ a * x^b, start = list(a=1,b=2),se=FALSE) + 
-  # geom_smooth(method="glm", aes(color="Exp Model"), formula= (y ~ exp(x)), 
-  #              se=TRUE, linetype = 1) +
-  scale_x_log10() + 
-  scale_y_log10() + 
-  scale_color_viridis_d() + 
-  theme(legend.position = 'none') + 
-  facet_wrap(~gas, scales = 'free') 
-
-
-
-# create table with regression formula and r2
-unfccc_subset <- unfccc[cv_NIR > 0]
-fits_unfccc <- unfccc_subset[, list(fit = list(lm(log(cv_NIR) ~ log(emissions_CRF)))), 
-            by = .(gas, party)]
-fits_unfccc[, a := sapply(fit, function(x) exp(coef(x)[1]))]
-fits_unfccc[, b := sapply(fit, function(x) (coef(x)[2]))]
-fits_unfccc[, r2 := sapply(fit, function(x) summary(x)$r.squared)]
-fits_unfccc[, equation := sprintf("$y = %.2fx^{%.2f}$", a, b)]
-fits_unfccc[, "$R^2$" := sprintf("%.3f", r2)]
-
-
-edgar_subset <- edgar[cv > 0]
-fits_edgar <- edgar_subset[, list(fit = list(lm(log(cv) ~ log(emissions_solazzo)))), 
-                    by = .(gas, country_code)]
-fits_edgar[, a := sapply(fit, function(x) exp(coef(x)[1]))]
-fits_edgar[, b := sapply(fit, function(x) (coef(x)[2]))]
-fits_edgar[, r2 := sapply(fit, function(x) summary(x)$r.squared)]
-fits_edgar[, equation := sprintf("$y = %.2fx^{%.2f}$", a, b)]
-fits_edgar[, "$R^2$" := sprintf("%.3f", r2)]
-
-fits <- rbindlist(list(unfccc = fits_unfccc, edgar = fits_edgar), 
-          idcol = 'database')
-
-ggplot(fits, aes(x = gas, y = r2, fill = database, col = database)) + 
-  geom_boxplot(alpha = 0.5) + 
-  scale_fill_colorblind7() + 
-  scale_color_colorblind7() + 
-  theme(legend.position = 'bottom')
-
-ggsave2(filename = "r2_boxplot.pdf", height = 4, width = 7)
-
-
-for (iparty in unique(unfccc$party)) {
-  for (igas in unique(unfccc$gas)) {
-    # Subset the data for current gas
-    current_data <- unfccc[cv_NIR > 0 & gas == igas & party == iparty]
-    
-    # Fit the model
-    fit <- lm(log(cv_NIR) ~ log(emissions_CRF), data=current_data)
-    
-    # Extract coefficients
-    a <- exp(coef(fit)[1])
-    b <- coef(fit)[2]
-    
-    # Extract R-squared value
-    r_squared <- summary(fit)$r.squared
-    
-    # Create the equation label
-    #label <- TeX(sprintf("$y = %.2fx^{%.2f}$", a, b), output = 'character')
-    equation <- sprintf("$y = %.2fx^{%.2f}$", a, b)
-    r2_label <- sprintf("$R^2 = %.3f$", r_squared)
-  }
-}
-
-
-
-library(ggplot2)
-library(gridExtra) # to arrange multiple plots
-library(ggtext)
-library(latex2exp)
-data_subset <- unfccc[unfccc$cv_NIR > 0 & party == 'ITA' ]
-
-# Unique gases
-gases <- unique(data_subset$gas)
-
-plot_list <- list()
-
-for(igas in gases) {
-  
-  # Subset the data for current gas
-  current_data <- subset(data_subset, gas == igas)
-  
-  # Fit the model
-  fit <- lm(log(cv_NIR) ~ log(emissions_CRF), data=current_data)
-  
-  # Extract coefficients
-  a <- exp(coef(fit)[1])
-  b <- coef(fit)[2]
-  
-  # Extract R-squared value
-  r_squared <- summary(fit)$r.squared
-  
-  # Create the equation label
-  #label <- TeX(sprintf("$y = %.2fx^{%.2f}$", a, b), output = 'character')
-  equation <- sprintf("$y = %.2fx^{%.2f}$", a, b)
-  r2_label <- sprintf("$R^2 = %.3f$", r_squared)
-  label <- TeX(paste(equation, ",\n", r2_label), output = 'character')
-  
-  # Create plot for current gas
-  p <- ggplot(current_data, aes(x=emissions_CRF, y=cv_NIR)) + 
-    geom_point(alpha = 0.3, shape = 16, col = 'grey30') + 
-    geom_smooth(method = 'lm', formula = y ~ x,
-                se = FALSE, col = my_cols[7]) +
-    scale_x_log10() + 
-    scale_y_log10() + 
-    labs(title = igas) +
-    ylab("CV") + 
-    xlab('Emissions') + 
-  # annotate(geom='text', x=3, y=3, label=TeX("$\\hat{Y} = B_0 + B_1X_1", 
-  #output='character'), parse=TRUE) 
-     annotate("text", x = Inf, y = Inf, label = label, 
-              hjust = 1.1, vjust = 1.1, parse = TRUE)
-  
-  if (igas != 'CO2') {
-    p <- p + theme(axis.title.x=element_blank())  
-  }
-  
-  if (igas != 'CH4') {
-    p <- p + theme(axis.title.y=element_blank())  
-  }
-  
-  # Append plot to the list
-  plot_list[[igas]] <- p
-}
-
-# Combine plots
-ggpubr::ggarrange(plotlist = plot_list, nrow = 1,align = 'h')
+# unfccc <- readRDS(file.path(path2results, 'merge_CRF_NIR_data.RData'))
+# edgar <- readRDS(file.path(path2results, 'parse_EDGAR_uncertainty.RData'))
+# 
+# unfccc$cv_NIR %>% summary
+# unfccc[cv_NIR < 0.001]
+# 
+# library(ggpmisc)
+# 
+# 
+# ggplot(unfccc[cv_NIR>0], aes(x= emissions_CRF, y = cv_NIR, col = party)) + 
+#   geom_point(alpha = 0.3, shape = 16) + 
+#   geom_smooth(aes(group = party), method = 'glm', se = FALSE) + 
+# #  geom_smooth(method = 'nls', formula = y ~ a * x^b, start = list(a=1,b=2),se=FALSE) + 
+#  # geom_smooth(method="glm", aes(color="Exp Model"), formula= (y ~ exp(x)), 
+# #              se=TRUE, linetype = 1) +
+#   scale_x_log10() + 
+#   scale_y_log10() + 
+#   scale_color_viridis_d() + 
+#   theme(legend.position = 'none') + 
+#   facet_wrap(~gas, scales = 'free') 
+# 
+# ggplot(edgar[cv>0], aes(x= emissions_solazzo, y = cv, col = country_code)) + 
+#   geom_point(alpha = 0.3, shape = 16) + 
+#   geom_smooth(method = 'glm', se = FALSE) + 
+#   #  geom_smooth(method = 'nls', formula = y ~ a * x^b, start = list(a=1,b=2),se=FALSE) + 
+#   # geom_smooth(method="glm", aes(color="Exp Model"), formula= (y ~ exp(x)), 
+#   #              se=TRUE, linetype = 1) +
+#   scale_x_log10() + 
+#   scale_y_log10() + 
+#   scale_color_viridis_d() + 
+#   theme(legend.position = 'none') + 
+#   facet_wrap(~gas, scales = 'free') 
+# 
+# 
+# 
+# # create table with regression formula and r2
+# unfccc_subset <- unfccc[cv_NIR > 0]
+# fits_unfccc <- unfccc_subset[, list(fit = list(lm(log(cv_NIR) ~ log(emissions_CRF)))), 
+#             by = .(gas, party)]
+# fits_unfccc[, a := sapply(fit, function(x) exp(coef(x)[1]))]
+# fits_unfccc[, b := sapply(fit, function(x) (coef(x)[2]))]
+# fits_unfccc[, r2 := sapply(fit, function(x) summary(x)$r.squared)]
+# fits_unfccc[, equation := sprintf("$y = %.2fx^{%.2f}$", a, b)]
+# fits_unfccc[, "$R^2$" := sprintf("%.3f", r2)]
+# 
+# 
+# edgar_subset <- edgar[cv > 0]
+# fits_edgar <- edgar_subset[, list(fit = list(lm(log(cv) ~ log(emissions_solazzo)))), 
+#                     by = .(gas, country_code)]
+# fits_edgar[, a := sapply(fit, function(x) exp(coef(x)[1]))]
+# fits_edgar[, b := sapply(fit, function(x) (coef(x)[2]))]
+# fits_edgar[, r2 := sapply(fit, function(x) summary(x)$r.squared)]
+# fits_edgar[, equation := sprintf("$y = %.2fx^{%.2f}$", a, b)]
+# fits_edgar[, "$R^2$" := sprintf("%.3f", r2)]
+# 
+# fits <- rbindlist(list(unfccc = fits_unfccc, edgar = fits_edgar), 
+#           idcol = 'database')
+# 
+# ggplot(fits, aes(x = gas, y = r2, fill = database, col = database)) + 
+#   geom_boxplot(alpha = 0.5) + 
+#   scale_fill_colorblind7() + 
+#   scale_color_colorblind7() + 
+#   theme(legend.position = 'bottom')
+# 
+# ggsave2(filename = "r2_boxplot.pdf", height = 4, width = 7)
+# 
+# 
+# for (iparty in unique(unfccc$party)) {
+#   for (igas in unique(unfccc$gas)) {
+#     # Subset the data for current gas
+#     current_data <- unfccc[cv_NIR > 0 & gas == igas & party == iparty]
+#     
+#     # Fit the model
+#     fit <- lm(log(cv_NIR) ~ log(emissions_CRF), data=current_data)
+#     
+#     # Extract coefficients
+#     a <- exp(coef(fit)[1])
+#     b <- coef(fit)[2]
+#     
+#     # Extract R-squared value
+#     r_squared <- summary(fit)$r.squared
+#     
+#     # Create the equation label
+#     #label <- TeX(sprintf("$y = %.2fx^{%.2f}$", a, b), output = 'character')
+#     equation <- sprintf("$y = %.2fx^{%.2f}$", a, b)
+#     r2_label <- sprintf("$R^2 = %.3f$", r_squared)
+#   }
+# }
+# 
+# 
+# 
+# library(ggplot2)
+# library(gridExtra) # to arrange multiple plots
+# library(ggtext)
+# library(latex2exp)
+# data_subset <- unfccc[unfccc$cv_NIR > 0 & party == 'ITA' ]
+# 
+# # Unique gases
+# gases <- unique(data_subset$gas)
+# 
+# plot_list <- list()
+# 
+# for(igas in gases) {
+#   
+#   # Subset the data for current gas
+#   current_data <- subset(data_subset, gas == igas)
+#   
+#   # Fit the model
+#   fit <- lm(log(cv_NIR) ~ log(emissions_CRF), data=current_data)
+#   
+#   # Extract coefficients
+#   a <- exp(coef(fit)[1])
+#   b <- coef(fit)[2]
+#   
+#   # Extract R-squared value
+#   r_squared <- summary(fit)$r.squared
+#   
+#   # Create the equation label
+#   #label <- TeX(sprintf("$y = %.2fx^{%.2f}$", a, b), output = 'character')
+#   equation <- sprintf("$y = %.2fx^{%.2f}$", a, b)
+#   r2_label <- sprintf("$R^2 = %.3f$", r_squared)
+#   label <- TeX(paste(equation, ",\n", r2_label), output = 'character')
+#   
+#   # Create plot for current gas
+#   p <- ggplot(current_data, aes(x=emissions_CRF, y=cv_NIR)) + 
+#     geom_point(alpha = 0.3, shape = 16, col = 'grey30') + 
+#     geom_smooth(method = 'lm', formula = y ~ x,
+#                 se = FALSE, col = my_cols[7]) +
+#     scale_x_log10() + 
+#     scale_y_log10() + 
+#     labs(title = igas) +
+#     ylab("CV") + 
+#     xlab('Emissions') + 
+#   # annotate(geom='text', x=3, y=3, label=TeX("$\\hat{Y} = B_0 + B_1X_1", 
+#   #output='character'), parse=TRUE) 
+#      annotate("text", x = Inf, y = Inf, label = label, 
+#               hjust = 1.1, vjust = 1.1, parse = TRUE)
+#   
+#   if (igas != 'CO2') {
+#     p <- p + theme(axis.title.x=element_blank())  
+#   }
+#   
+#   if (igas != 'CH4') {
+#     p <- p + theme(axis.title.y=element_blank())  
+#   }
+#   
+#   # Append plot to the list
+#   plot_list[[igas]] <- p
+# }
+# 
+# # Combine plots
+# ggpubr::ggarrange(plotlist = plot_list, nrow = 1,align = 'h')
 
 ############################################################################## # 
 ##### Plots #############################################################
@@ -490,8 +490,9 @@ ggsave2(filename = "full_by_reg.pdf", height = 6, width = 7)
 
 ggsave2(filename = "gea_by_reg.pdf", height = 6, width = 6)
 
-ggsave_data(gea_by_reg[, .(gas, EB_region, mean, CI2.5 = (CI2.5/mean)-1, 
-                           CI97.5 = (CI97.5/mean)/1,
+ggsave_data(gea_by_reg[, .(gas, EB_region, mean, 
+                           CI2.5 = (CI2.5/mean)-1, 
+                           CI97.5 = (CI97.5/mean)-1,
                            cv, 
                            EXIOBASE = (value_exio/mean)-1, 
                            UNFCCC = (emissions_CRF/mean)-1, 
@@ -1021,7 +1022,7 @@ for (igas in c('CH4', 'CO2', 'N2O')) {
 (pfull <- ggarrange(plots = p, ncol = 1))
 
 
-`# __iii. Save ============================================================
+# __iii. Save ============================================================
 
 ggsave2(plot = pfull, filename = "gea_by_ind_rel.pdf", height = 5, width = 7)
 
@@ -1150,7 +1151,7 @@ kableExtra::kbl(table_valid, digits = 2,escape = FALSE, format = 'latex',
     na.omit() %>% 
     .[] %>% 
     ggplot(aes(x = variable, y = value, fill = `EXIOBASE ... our 95\\% CI`, 
-               label = scales::percent(round(value, 2)))) + 
+               label = scales::percent(round(value, 2), accuracy = 1))) + 
     geom_col() + 
     geom_text(size = 3, position = position_stack(vjust = 0.5)) + 
     scale_fill_colorblind7() + 
@@ -1174,7 +1175,7 @@ kableExtra::kbl(table_valid, digits = 2,escape = FALSE, format = 'latex',
     .[] %>% 
     na.omit() %>% 
     ggplot(aes(x = variable, y = value, fill = `EXIOBASE ... our 95\\% CI`, 
-               label = scales::percent(round(value, 2)))) + 
+               label = scales::percent(round(value, 2), accuracy = 1))) + 
     geom_col() + 
     geom_text(size = 3, position = position_stack(vjust = 0.5)) + 
     scale_fill_colorblind7() + 

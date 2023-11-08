@@ -116,7 +116,7 @@ setnames(data, c('time', 'airpol'), c('year', 'gas'))
 ############################################################################## # 
 ##### save results ################################################
 ############################################################################## # 
-save_results(data[, .(gas, year, country, NET_LAND)][])
+save_results(data[, .(gas, year, country, NET_LAND)][], type = '.feather')
 
 
 

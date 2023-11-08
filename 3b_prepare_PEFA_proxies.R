@@ -178,8 +178,8 @@ mean_split[, share := emissions / sum(emissions),
 ############################################################################## # 
 ##### save results #############################################################
 ############################################################################## # 
-save_results(pefa2)
-save_results(mean_split, suffix = '_mean_ind-hous_split')
+save_results(pefa2, type = '.feather')
+save_results(mean_split, suffix = '_mean_ind-hous_split', type = '.feather')
 #saveRDS(pefa2, './temp_results/4b_PEFA_proxies.RData')
 
 # THE END ---------------------------------------------------------------------

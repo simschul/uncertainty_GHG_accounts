@@ -20,6 +20,7 @@ library(ggforce)
 library(rio)
 library(ggthemes)
 library(countrycode)
+library(arrow)
 ############################################################################## # 
 ##### settings #################################################################
 ############################################################################## # 
@@ -70,7 +71,7 @@ data <- lapply(GASES, function(x) data) %>%
 
 
 # save =========================================================================
-save_results(data[, .(gas, country, year, share)])
+save_results(data[, .(gas, country, year, share)], type = '.feather')
 
 
 

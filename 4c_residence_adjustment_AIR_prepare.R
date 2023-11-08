@@ -134,9 +134,9 @@ test_that('test 1', {
 
 
 # save results =================================================================
-save_results(data_bridge, suffix = '_eurostat')
-save_results(datawb, suffix = '_worldbank')
-save_results(country_shares)
+save_results(data_bridge, suffix = '_eurostat', type = '.feather')
+save_results(datawb, suffix = '_worldbank', type = '.feather')
+save_results(country_shares, type = '.feather')
 
 
 

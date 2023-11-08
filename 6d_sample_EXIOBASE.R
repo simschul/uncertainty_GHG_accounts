@@ -150,7 +150,7 @@ my_cols <- (colorblind_pal()(8))
 
 RhpcBLASctl::blas_set_num_threads(config$n_cores)
 getDTthreads()
-setDTthreads(1)
+#setDTthreads(1)
 options(error=recover) 
 
 ############################################################################## # 
@@ -160,87 +160,82 @@ options(error=recover)
 dt <- readRDS(file.path(path2output, 'run_optimizer.RData'))
 dt
 
-# 1. Subset data ===============================================================
-# needed because of memory constraints
-
-dt_dir <- dt[sapply(proxies, is.data.table) & !is.na(gamma)]
-dt_1to1_1 <- dt[sapply(proxies, function(x) is.data.table(x) && nrow(x) == 1)]
-dt_1to1_2 <- dt[optim_needed == FALSE & !sapply(proxies, is.data.table)]
-
-test_that("Subsets have together same number of rows than original data", {
-  expect_equal(nrow(dt), nrow(dt_dir) + nrow(dt_1to1_1) + nrow(dt_1to1_2))
-})
-
-# further divide dt_dir into junks of 1000 rows each
-seq <- c(seq.int(0, nrow(dt[sapply(proxies, is.data.table) & !is.na(gamma)]), 
-                 by = 1000), nrow(dt[sapply(proxies, is.data.table) & !is.na(gamma)]))
-
-dt_dir_list <- lapply(1:(length(seq)-1), function(i) {
-  return(dt_dir[(seq[i]+1):seq[i+1]])
-})
-
-test_that("Subsets have together same number of rows than original data, 2", {
-  expect_equal(nrow(dt_dir), sum(sapply(dt_dir_list, nrow)))
-})
-
-rm(dt_dir)
-rm(dt)
-
-# 2. sample in for loop ===========================================================
-# _a) sample from dirichlet where necessary ====================================
-
-for (i in 1:length(dt_dir_list)) {
-  dt_dir_list[[i]] <- sample_dt(dt_dir_list[[i]], 
-                                type = 'dir')
-  save_results(dt_dir_list[[i]], type = '.feather', suffix = paste0('_dir', i))
-  dt_dir_list[[i]] <- 0
-  gc()
-}
-
-rm(dt_dir_list)
-
-# _b) sample 1:1 correspondences ===============================================
-# (correspondences which map in theory to more than one industry, but in practice 
-# all but one industry have a zero proxy value)
-dt_1to1_1 <- sample_dt(dt_1to1_1, type = '1to1_1')
-save_results(dt_1to1_1, type = '.feather', suffix = paste0('_1to11'))
-rm(dt_1to1_1)
-
-# c) sample real 1 to 1 correspondences ===============================================
-dt_1to1_2 <- sample_dt(dt_1to1_2, type = '1to1_2')
-save_results(dt_1to1_2, type = '.feather', suffix = paste0('_1to12'))
-rm(dt_1to1_2)
+# # 1. Subset data ===============================================================
+# # needed because of memory constraints
+# 
+# dt_dir <- dt[sapply(proxies, is.data.table) & !is.na(gamma)]
+# dt_1to1_1 <- dt[sapply(proxies, function(x) is.data.table(x) && nrow(x) == 1)]
+# dt_1to1_2 <- dt[optim_needed == FALSE & !sapply(proxies, is.data.table)]
+# 
+# test_that("Subsets have together same number of rows than original data", {
+#   expect_equal(nrow(dt), nrow(dt_dir) + nrow(dt_1to1_1) + nrow(dt_1to1_2))
+# })
+# 
+# # further divide dt_dir into junks of 1000 rows each
+# seq <- c(seq.int(0, nrow(dt[sapply(proxies, is.data.table) & !is.na(gamma)]), 
+#                  by = 1000), nrow(dt[sapply(proxies, is.data.table) & !is.na(gamma)]))
+# 
+# dt_dir_list <- lapply(1:(length(seq)-1), function(i) {
+#   return(dt_dir[(seq[i]+1):seq[i+1]])
+# })
+# 
+# test_that("Subsets have together same number of rows than original data, 2", {
+#   expect_equal(nrow(dt_dir), sum(sapply(dt_dir_list, nrow)))
+# })
+# 
+# rm(dt_dir)
+# rm(dt)
+# 
+# # 2. sample in for loop ===========================================================
+# # _a) sample from dirichlet where necessary ====================================
+# 
+# for (i in 1:length(dt_dir_list)) {
+#   dt_dir_list[[i]] <- sample_dt(dt_dir_list[[i]], 
+#                                 type = 'dir')
+#   save_results(dt_dir_list[[i]], type = '.feather', suffix = paste0('_dir', i))
+#   dt_dir_list[[i]] <- 0
+#   gc()
+# }
+# 
+# rm(dt_dir_list)
+# 
+# # _b) sample 1:1 correspondences ===============================================
+# # (correspondences which map in theory to more than one industry, but in practice 
+# # all but one industry have a zero proxy value)
+# dt_1to1_1 <- sample_dt(dt_1to1_1, type = '1to1_1')
+# save_results(dt_1to1_1, type = '.feather', suffix = paste0('_1to11'))
+# rm(dt_1to1_1)
+# 
+# # c) sample real 1 to 1 correspondences ===============================================
+# dt_1to1_2 <- sample_dt(dt_1to1_2, type = '1to1_2')
+# save_results(dt_1to1_2, type = '.feather', suffix = paste0('_1to12'))
+# rm(dt_1to1_2)
 
 
 
 # 2. sample SUT proxies ===========================================================
-# dt[sapply(proxies, is.data.table) & is.na(gamma)]
-# 
-# # _a) sample from dirichlet where necessary ====================================
-# 
-# 
-# # dt[sapply(proxies, is.data.table) & !is.na(gamma)
-# #    , sample_EB := mapply(FUN = sample_dirichlet, 
-# #                          sample_aggregate = sample, 
-# #                          proxies = proxies, 
-# #                          gamma = gamma, 
-# #                          SIMPLIFY = FALSE)]
-# 
-# dt[sapply(proxies, is.data.table) & !is.na(gamma)]
-# 
-# 
-# 
-# 
-# 
-# 
+dt[sapply(proxies, is.data.table) & is.na(gamma)]
+
+# _a) sample from dirichlet where necessary ====================================
+
+
+dt[sapply(proxies, is.data.table) & !is.na(gamma)
+   , sample_EB := mapply(FUN = sample_dirichlet,
+                         sample_aggregate = sample,
+                         proxies = proxies,
+                         gamma = gamma,
+                         SIMPLIFY = FALSE)]
+
+dt[sapply(proxies, is.data.table) & !is.na(gamma)]
+
 # for (i in 1:(length(seqs)-1)) {
 #   cat(i,'')
 #   dt_subset <- dt[sapply(proxies, is.data.table) & !is.na(gamma)][(seqs[i]+1):seqs[i+1]]
-#   dt_subset[, sample_EB := pbmcmapply(FUN = sample_dirichlet, 
-#                                       sample_aggregate = sample, 
-#                                       proxies = proxies, 
-#                                       gamma = gamma, 
-#                                       SIMPLIFY = FALSE, 
+#   dt_subset[, sample_EB := pbmcmapply(FUN = sample_dirichlet,
+#                                       sample_aggregate = sample,
+#                                       proxies = proxies,
+#                                       gamma = gamma,
+#                                       SIMPLIFY = FALSE,
 #                                       mc.cores = 4)]
 #   save_results(dt_subset, suffix = i)
 #   rm(dt_subset)
@@ -248,12 +243,12 @@ rm(dt_1to1_2)
 # library(arrow)
 # 
 # dt_subset %>% object.size() %>% format(units = 'MiB')
-# dt_subset[, .(country_code, gas, database, category_code, 
+# dt_subset[, .(country_code, gas, database, category_code,
 #               emissions)] %>% object.size() %>% format(units = 'MiB')
 # 
 # dt[, sum(sapply(EXIOBASE_code, length))] * 5000 * 56 / (1024^3)
 # 
-# (object.size(runif(5000)) * dt[, sum(sapply(EXIOBASE_code, length))]) %>% 
+# (object.size(runif(5000)) * dt[, sum(sapply(EXIOBASE_code, length))]) %>%
 #   format(units = 'GiB')
 # 
 # keys <- key(dt)
@@ -266,61 +261,62 @@ rm(dt_1to1_2)
 # write_feather(dt4, file.path(path2output, 'temp.feather'))
 # saveRDS(dt4, file.path(path2output, 'temp.RData'))
 # temp <- read_feather(file.path(path2output, 'temp.feather'))
-# 
-# 
-# # _b) sample 1:1 correspondences ===============================================
-# # (correspondences which map in theory to more than one industry, but in practice 
-# # all but one industry have a zero proxy value)
-# dt[sapply(proxies, function(x) is.data.table(x) && nrow(x) == 1)]
-# 
-# dt[sapply(proxies, function(x) is.data.table(x) && nrow(x) == 1)
-#    , sample_EB := mapply(FUN = sample_1to1, 
-#                          sample_aggregate = sample, 
-#                          proxies = proxies, 
-#                          SIMPLIFY = FALSE)]
-# 
-# 
-# # sample 1 to 1 correspondences ===============================================
-# dt[optim_needed == FALSE & !sapply(sample_EB, is.data.table)]
-# dt[optim_needed == FALSE & !sapply(sample_EB, is.data.table), 
-#    sample_EB := list(mapply(function(sample, target) data.table(industry_code = target, 
-#                                                                 sample = list(sample)), 
-#                             target = EXIOBASE_code, 
-#                             sample = sample, 
-#                             SIMPLIFY = FALSE))]
-# 
-# 
-# dt[!sapply(sample_EB, is.data.table)]
-# 
-# 
-# 
-# # unnest data.table =========================================================
-# #unnest_dt(dt, col = 'sample_EB', by = )
-# 
-# keys <- key(dt)
-# dt2 <- dt[, c(key(dt), 'sample_EB', 'gamma', 'emissions'), with = FALSE]
-# rm(dt)
-# dt2 <- as.data.table(unnest(dt2, cols = 'sample_EB'))
-# 
-# dt3 <- unnest_dt(dt2, 'sample_EB')
-# 
-# setkeyv(dt2, c(key(dt), 'industry_code'))
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# # Save results ================================================================
-# save_results(dt2, suffix = '_detailed')
-# 
-# 
-# 
-# 
-# 
-# 
+
+
+# _b) sample 1:1 correspondences ===============================================
+# (correspondences which map in theory to more than one industry, but in practice
+# all but one industry have a zero proxy value)
+dt[sapply(proxies, function(x) is.data.table(x) && nrow(x) == 1)]
+
+dt[sapply(proxies, function(x) is.data.table(x) && nrow(x) == 1)
+   , sample_EB := mapply(FUN = sample_1to1,
+                         sample_aggregate = sample,
+                         proxies = proxies,
+                         SIMPLIFY = FALSE)]
+
+
+# sample 1 to 1 correspondences ===============================================
+dt[optim_needed == FALSE & !sapply(sample_EB, is.data.table)]
+dt[optim_needed == FALSE & !sapply(sample_EB, is.data.table),
+   sample_EB := list(mapply(function(sample, target) data.table(industry_code = target,
+                                                                sample = list(sample)),
+                            target = EXIOBASE_code,
+                            sample = sample,
+                            SIMPLIFY = FALSE))]
+
+
+dt[!sapply(sample_EB, is.data.table)]
+
+
+
+# unnest data.table =========================================================
+#unnest_dt(dt, col = 'sample_EB', by = )
+
+keys <- key(dt)
+dt2 <- dt[, c(key(dt), 'sample_EB', 'gamma', 'emissions'), with = FALSE]
+#rm(dt)
+dt2[, sample_EB := lapply(sample_EB, as_tibble)]
+dt2 <- as.data.table(unnest(dt2, cols = 'sample_EB'))
+
+#dt3 <- unnest_dt(dt2, 'sample')
+
+setkeyv(dt2, c(key(dt), 'industry_code'))
+
+
+
+
+
+
+
+
+# Save results ================================================================
+save_results(dt2, suffix = '_detailed', type = '.feather')
+
+
+
+
+
+
 
 
 

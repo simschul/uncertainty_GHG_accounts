@@ -1,5 +1,7 @@
 .Rproj.user
 .Rhistory
 .Rdata
+.feather
 .httr-oauth
 .DS_Store
+intermediate_results/

@@ -20,6 +20,7 @@ library(ggforce)
 library(countrycode)
 library(mRio)
 library(testthat)
+library(arrow)
 
 ############################################################################## # 
 ##### settings #################################################################
@@ -98,6 +99,7 @@ get_SUT_shares <- function(sut,
 
 edgar_samples <- readRDS(file.path(path2output, 'sample_EDGAR.RData')) #'./temp_results/3b_EDGAR_samples.RData')
 ct <- readRDS(config$path2CT_CRF_EDGAR_parsed)
+#ct <- readRDS(file.path(path2output, 'prepare_CT_EDGAR.RData'))
 #ct <- readRDS('/home/simon/Documents/Projects/Uncertainty_Extensions/code/UNFCCC_CRF_correspondence_tables/intermediate_results/CT_EDGAR_parsed.RData')
 
 
@@ -182,11 +184,11 @@ dt <- dt[!(country_code %in% c('SEA', 'AIR'))]
 
 # __i. load data ---------------------------------------------------------------
 
-use <- readRDS(file.path(path2output, 'prepare_SUT_proxies_use.RData'))
+use <- read_feather(file.path(path2output, 'prepare_SUT_proxies_use.feather'))
 use <- na.omit(use)
 
 
-supply <- readRDS(file.path(path2output, 'prepare_SUT_proxies_supply.RData'))
+supply <- read_feather(file.path(path2output, 'prepare_SUT_proxies_supply.feather'))
 supply <- na.omit(supply)
 
 
@@ -239,7 +241,8 @@ dt[sapply(proxies, function(x) if (is.data.table(x)) nrow(x) == 1 else FALSE)]$p
 ############################################################################## # 
 # _b) ROAD TRANSPORT ------------------------------------------------------------------
 ############################################################################## # 
-road <- readRDS(file.path(path2output, 'prepare_ROAD_TRANSPORT_proxies.RData'))
+road <- read_feather(file.path(path2output, 'prepare_ROAD_TRANSPORT_proxies.feather'))
+road[, proxies := lapply(proxies, as.data.table)]
 road[, proxy_data_source := 'PEFA']
 setnames(road, c('region', 'proxies'), c('EXIOBASE_region_code', 'proxies_ROAD'))
 

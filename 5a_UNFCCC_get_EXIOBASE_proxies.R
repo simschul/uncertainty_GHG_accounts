@@ -20,7 +20,7 @@ library(ggforce)
 library(countrycode)
 library(mRio)
 library(testthat)
-
+library(arrow)
 ############################################################################## # 
 ##### settings #################################################################
 ############################################################################## # 
@@ -35,6 +35,7 @@ theme_set(theme_bw())
 
 
 path2CountryMappingDESIRE <- config$path2CountryMappingDESIRE
+path2CT <- file.path(path2output, 'prepare_CT_UNFCCC.RData')
 path2CT <- config$path2CT_CRF_EXIOBASE_parsed
 
 ############################################################################## # 
@@ -44,7 +45,7 @@ path2CT <- config$path2CT_CRF_EXIOBASE_parsed
 
 unfccc_samples <- readRDS(file.path(path2output, 'sample_UNFCCC.RData'))
 ct <- readRDS(path2CT)
-
+ct[sapply(EXIOBASE_code, length) == 0]
 ############################################################################## # 
 ##### 1. Merge UNFCCC samples with EXIOBASE Correspondence table ###############
 ############################################################################## # 
@@ -182,12 +183,12 @@ dt[, .(party, EXIOBASE_region_code)] %>% unique
 
 # __i. load data ---------------------------------------------------------------
 
-use <- readRDS(file.path(path2output, 'prepare_SUT_proxies_use.RData'))
+use <- read_feather(file.path(path2output, 'prepare_SUT_proxies_use.feather'))
 #use[, country_industry := countrycode(country_industry,'iso2c', 'iso3c')]
 use <- na.omit(use)
 
 
-supply <- readRDS(file.path(path2output, 'prepare_SUT_proxies_supply.RData'))
+supply <- read_feather(file.path(path2output, 'prepare_SUT_proxies_supply.feather'))
 #supply <- readRDS('./temp_results/4a_supply.RData')
 #supply[, country_industry := countrycode(country_industry,'iso2c', 'iso3c')]
 supply <- na.omit(supply)
@@ -241,8 +242,10 @@ dt[sapply(proxies, function(x) if (is.data.table(x)) nrow(x) == 1 else FALSE)]
 ############################################################################## # 
 # _b) ROAD TRANSPORT ------------------------------------------------------------------
 ############################################################################## # 
-road <- readRDS(file.path(path2output, 'prepare_ROAD_TRANSPORT_proxies.RData'))
+road <- read_feather(file.path(path2output, 'prepare_ROAD_TRANSPORT_proxies.feather'))
+road[, proxies := lapply(proxies, as.data.table)]
 road[, proxy_data_source := 'PEFA']
+#road$proxies_ROAD[[1]]
 setnames(road, c('region', 'proxies'), c('EXIOBASE_region_code', 'proxies_ROAD'))
 
 dt <- merge(dt, road, 
@@ -292,6 +295,7 @@ missing_proxies <- dt[!(proxy_data_source %in% c('1to1'))
                       & !sapply(proxies, is.data.table)
                       , .(category_code, classification)] %>% 
   unique
+
 
 test_that('no proxies are missing', {
   expect_equal(nrow(missing_proxies), 0)

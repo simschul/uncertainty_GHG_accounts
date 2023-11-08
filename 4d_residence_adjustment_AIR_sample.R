@@ -37,8 +37,8 @@ config <- setup_config_and_log()
 path2output <- config$path2output
 
 
-path2shares <- file.path(path2output, 'residence_adjustment_AIR_prepare.RData')
-path2sharesEU <- file.path(path2output, 'residence_adjustment_AIR_prepare_eurostat.RData')
+path2shares <- file.path(path2output, 'residence_adjustment_AIR_prepare.feather')
+path2sharesEU <- file.path(path2output, 'residence_adjustment_AIR_prepare_eurostat.feather')
 path2edgar <- file.path(path2output, 'parse_EDGAR_emissions2015_parsed.RData')
 path2edgar_un <- file.path(path2output, 'parse_EDGAR_uncertainty.RData') 
 
@@ -114,8 +114,8 @@ data[, round(sum(emissions)), by = gas]
 
 # _a) load data ===============================================================
 # Country specific use shares from Eurostat + Worldbank
-country_shares_eu <- readRDS(path2sharesEU)
-country_shares <- readRDS(path2shares)
+country_shares_eu <- read_feather(path2sharesEU)
+country_shares <- read_feather(path2shares)
 
 
 # _b) Rescale regional (EU/nonEU) shares to global shares ==========================
@@ -252,6 +252,6 @@ test_that('all good', {
 ############################################################################## # 
 ##### save results #############################################################
 ############################################################################## # 
-save_results(samples_dt2)
+save_results(samples_dt2, type = '.feather')
 
 # THE END ---------------------------------------------------------------------

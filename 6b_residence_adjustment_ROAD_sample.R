@@ -19,6 +19,7 @@ library(ggforce)
 library(truncnorm)
 library(testthat)
 library(countrycode)
+library(arrow)
 
 ############################################################################## # 
 ##### functions #################################################################
@@ -35,7 +36,7 @@ config <- setup_config_and_log()
 path2output <- config$path2output
 theme_set(theme_bw())
 
-path2bridge <-  file.path(path2output, 'residence_adjustment_ROAD_prepare.RData') 
+path2bridge <-  file.path(path2output, 'residence_adjustment_ROAD_prepare.feather') 
 # path2edgar_samples <- file.path(path2output, 'sample_EDGAR.RData')
 # path2unfccc_samples <- file.path(path2output, 'sample_UNFCCC.RData')
 path2inventory_samples <- file.path(path2output, 'combine_UNFCCC_EDGAR_samples.RData') 
@@ -57,7 +58,7 @@ setkey(inventory, database, year, country_code, #EXIOBASE_region_code,
 
 
 # load bridging data
-country_bridge <- readRDS(path2bridge)
+country_bridge <- read_feather(path2bridge)
 country_bridge[, year := as.character(year)]
 setnames(country_bridge, 'country', 'country_code')
 
@@ -77,7 +78,8 @@ setkey(road, database, year, country_code, gas, category_code, classification)
 # calcluate national total road emissions
 road_totals <- road[, list(sample_totals = sum_samples(sample)), by = .(country_code, gas)]
 
-country_bridge <- merge(country_bridge, road_totals, by = c('country_code', 'gas'), all.x = TRUE, 
+country_bridge <- merge(country_bridge, road_totals, by = c('country_code', 'gas'), 
+                        all.x = TRUE, 
                         sort = FALSE)
 
 # remove countries without match (SRB), is later used to allocate residuals:
@@ -163,13 +165,15 @@ test_that('shares sum to 1', {
 })
 
 # Calculate unallocated bridging items (residuals)
-bridge_residuals <- country_bridge %>% 
+
+
+bridge_residuals <- country_bridge[, -c('sample_totals', 'NET_LAND')] %>% 
   unnest_sample %>% 
   .[, list(residual_emissions = sum(value)), 
     by = .(year, gas, run)]
 
 
-
+  
 # swap sign (--> negative sign for all EU countries mean positive bridging item for rest of Europe)
 bridge_residuals[, residual_emissions := -residual_emissions]
 
@@ -248,7 +252,7 @@ test_that("Residuence adjustment does not deliver negative emissions from road t
 expect_equal(nrow(road[value_adj < 0]), 0)
   
 })
-#road[value_adj < 0, value_adj := 0]
+road[value_adj < 0, value_adj := 0]
 
 # Nest sample
 road <- road[, 

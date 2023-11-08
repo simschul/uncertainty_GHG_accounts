@@ -39,17 +39,17 @@ theme_set(theme_bw())
 ############################################################################## # 
 ##### load data #############################################################
 ############################################################################## # 
-files <- list.files(path = path2output, 'sample_EXIOBASE', full.names = TRUE)
-
-dt <- lapply(files, read_feather)
-dt <- rbindlist(dt)
-
-object.size(dt) %>% format(units= 'GiB')
+# files <- list.files(path = path2output, 'sample_EXIOBASE', full.names = TRUE)
+# 
+# dt <- lapply(files, read_feather)
+# dt <- rbindlist(dt)
+# 
+# object.size(dt) %>% format(units= 'GiB')
 
 # begin old stuff
 
-#dt <- readRDS(file.path(path2output, 'sample_EXIOBASE_detailed.RData'))
-
+dt <- read_feather(file.path(path2output, 'sample_EXIOBASE_detailed.feather'))
+dt[, sample := as.list(sample)]
 
 # map to EXIOBASE regions -----------------------------------------------------
 exio_regions <- fread(file.path(config$path2exiobaseIOT, 'unit.txt')) %>% 
@@ -200,8 +200,6 @@ rm(dt_by_reg_crf)
 
 save_results(dt2, suffix = '_detailed', type = '.feather')
 
-# clean up disc memory
-unlink(files)
 
 
 # THE END ---------------------------------------------------------------------

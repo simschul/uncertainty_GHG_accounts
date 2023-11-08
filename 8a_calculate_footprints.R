@@ -20,7 +20,8 @@ library(mRio)
 library(pbmcapply)
 library(testthat)
 library(svMisc)
-library('RPostgreSQL')
+library(pbapply)
+#library('RPostgreSQL')
 
 ############################################################################## # 
 ##### settings #################################################################
@@ -50,6 +51,22 @@ calculate_S <- function(E, x) {
   S[!is.finite(S)] <- 0
   return(S)
 }
+as_sparse_dt <- function(x) {
+  x <- as.data.table(x)
+  x <- melt(x[,i:=.I], 
+            id.vars="i", 
+            variable.name = 'j')
+  x <- x[value>0]
+  x[,j:=as.integer(j)]
+  return(x[])
+}
+
+rbind_matrices_as_sparse <- function(x) {
+  x <- pblapply(x, as_sparse_dt)
+  x <- rbindlist(x, idcol = 'run')
+  x[, run := as.integer(run)]
+  return(x[])
+}
 
 ############################################################################## # 
 ##### load data #############################################################
@@ -62,80 +79,31 @@ xvec <- readRDS(file.path(path2output, 'prepare_EXIOBASE_x.RData'))
 S_samples <- lapply(F_samples, function(x) calculate_S(x, xvec))
 rm(F_samples)
 gc()
-
+length(S_samples)
 
 Ymat <- readRDS(file.path(path2output, 'prepare_EXIOBASE_Y.RData'))
 Lmat <- readRDS(file.path(path2output, 'prepare_EXIOBASE_L.RData'))
 
 # Calculate Footprints ========================================================
-#unlink(file.path(path2output, 'footprints'), recursive = TRUE)
-#dir.create(file.path(path2output, 'footprints'))
 
-pg = dbDriver("PostgreSQL")
-con = dbConnect(pg, user = 'postgres', 
-                dbname = 'template1', 
-                host = 'localhost',
-                password = '123')
-dbRemoveTable(con, 'footprint_multiplier')
-dbRemoveTable(con, 'footprint_national')
+fp_multiplier <- pblapply(S_samples, function(x) {
+  x %*% Lmat
+})
+rm(S_samples)
 
+fp_national <- pblapply(fp_multiplier, function(x) {
+  x %*% Ymat
+})
 
-calculate_footprints <- function(x, n_cores) {
-  
-}
+# reshape data into two big data.tables
 
-reshape_data <- function(x, irun) {
-  x <- as.data.table(x)
-  x <- melt(x[,i:=.I], 
-            id.vars="i", 
-            variable.name = 'j')
-  x <- x[value>0]
-  x[,j:=as.integer(j)]
-  x[, run := irun]
-  return(x[])
-}
+fp_national_dt <- rbind_matrices_as_sparse(fp_national)
+fp_multiplier_dt <- rbind_matrices_as_sparse(fp_multiplier)
 
 
-
-for (i in 1:length(S_samples)) {
-  fp_multiplier <- S_samples[[i]] %*% Lmat
-  fp_national <- fp_multiplier %*% Ymat
-  
-  fp_multiplier <- reshape_data(fp_multiplier, irun = i)
-  fp_national <- reshape_data(fp_national, irun = i)
-  
-  dbWriteTable(con, 'footprint_multiplier', 
-               fp_multiplier, 
-               append = TRUE, 
-               row.names = FALSE)
-  
-  dbWriteTable(con, 'footprint_national', 
-               fp_national, 
-               append = TRUE, 
-               row.names = FALSE)
-  
-  # suppressMessages(save_results(fp_multiplier,
-  #                               path = file.path(path2output, 'footprints'),  
-  #                               suffix = paste0('multiplier', i), 
-  #                               type = '.csv'))
-  # suppressMessages(save_results(fp_national,
-  #                               path = file.path(path2output, 'footprints'),  
-  #                               suffix = paste0('national', i), 
-  #                               type = '.csv'))
-   progress(i,length(S_samples))
-}
-
-dbDisconnect(con)
-
-# fp_multiplier <- pbmclapply(S_samples, function(x) {
-#   x %*% Lmat
-# }, mc.cores = 1)
-# 
-# fp_national <- pbmclapply(fp_multiplier, function(x) {
-#   x %*% Ymat
-# }, mc.cores = 1)
-
-
+# save results ==============================
+save_results(fp_national_dt, suffix = '_national', type = '.feather')
+save_results(fp_multiplier_dt, suffix = '_multiplier', type = '.feather')
 
 
 # plots ==============================

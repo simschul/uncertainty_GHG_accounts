@@ -42,13 +42,23 @@ path2CT <- config$path2CT_CRF_EXIOBASE
 ##### load data #############################################################
 ############################################################################## # 
 
+
+
+
 # which classifications exist in emissions data?
-classes_from_CT <- rio::import(path2CT) %>% 
-  as.data.table %>% 
+# classes_from_CT <- rio::import(path2CT) %>% 
+#   as.data.table %>% 
+#   .$CRF_class %>% 
+#   na.omit %>% 
+#   unique %>% 
+#   data.table(original = .)
+
+classes_from_CT <- readRDS(file.path(path2output, 'prepare_CT_UNFCCC.RData')) %>% 
   .$CRF_class %>% 
   na.omit %>% 
   unique %>% 
   data.table(original = .)
+
 
 classes_from_CT[, id := gsub(' ', '_', tolower(original))]
 
