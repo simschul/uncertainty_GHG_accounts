@@ -125,12 +125,12 @@ digraph G {
   "6c_run_optimizer" -> "6d_sample_EXIOBASE"
   "6d_sample_EXIOBASE" -> "6e_prepare_EXIOBASE_samples"
   "6e_prepare_EXIOBASE_samples" -> "6f_convert_to_matrix"
-  "7_prepare_EXIOBASE" -> "8_calculate_footprints"
+  "7a_prepare_EXIOBASE" -> "8a_calculate_footprints"
   
-  "6f_convert_to_matrix" -> "8_calculate_footprints"
+  "6f_convert_to_matrix" -> "8a_calculate_footprints"
   "6e_prepare_EXIOBASE_samples" -> "9_plot_results"
   "8a_calculate_footprints" -> "8b_prepare_footprints"
   "8b_prepare_footprints" -> "9_plot_results"
-  
+  "7b_prepare_oecd_AEA" -> "9_plot_results"
 } 
 ```

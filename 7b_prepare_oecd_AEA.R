@@ -38,7 +38,7 @@ theme_set(theme_bw())
 ##### load data #############################################################
 ############################################################################## # 
 
-dt <- fread('/home/simon/Documents/PhD_PROSET/data/OECD/AEA/AEA_20072023164314621.csv')
+dt <- fread(config$path2oecd)
 dt <- dt[ACTIVITY %in% c('IND-TOTAL', 'HH-TOTAL')]
 dt[, emissions_OECD := Value / 1E3]
 dt[, country := countrycode(COUNTRY, 'iso3c', 'iso2c')]
