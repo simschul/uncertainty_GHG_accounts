@@ -38,21 +38,43 @@ this repository
 
 ## How to run the scripts
 
-Before running the scripts you first need to adapt the `config.yml` file
-as follows:
+1.  [Clone the repository to create a local copy on you
+    computer](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository).
 
-1.  Adjust the paths to the data file (the directory where you saved the
-    data downloaded as indicated above)
-2.  Adjust the number of cores to the characteristics of your computer
-    (The more cores you use, (1) the faster the code runs, but also (2)
-    the more RAM you require).
+2.  Open the project by clicking on `uncertainty_GHG_accounts.Rproj`.
 
-The version number determines where the intermediate results are stored.
-This means when you run the scripts the first time with a give version
-number a sub-folder under `./intermediate_results` is created. Running
-the scripts again with the same version number overwrites the results.
+3.  [renv](https://cran.r-project.org/web/packages/renv/vignettes/renv.html)
+    will automatically bootstrap itself, downloading and installing the
+    appropriate version of renv. It will also ask you if you want to
+    download and install all the packages it needs by running
+    `renv::restore()`.
 
-The scripts need to be run according to the order indicated. The
-dependency graph of the individual scripts is depicted here:
+4.  Once the packages are installed, open the file `__main__.qmd`.
+
+5.  Run the code junks **one by one**.
+
+The scripts need to be run according to the order indicated (which the
+`__main__.qmd` does). The dependency graph of the individual scripts is
+depicted here:
 
 ![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+The code was tested with the following setup:
+
+    platform       x86_64-pc-linux-gnu         
+    arch           x86_64                      
+    os             linux-gnu                   
+    system         x86_64, linux-gnu           
+    status                                     
+    major          4                           
+    minor          3.1                         
+    year           2023                        
+    month          06                          
+    day            16                          
+    svn rev        84548                       
+    language       R                           
+    version.string R version 4.3.1 (2023-06-16)
+    nickname       Beagle Scouts 
+
+In case of problems please raise an [issue](/issues) or [contact
+me](mailto:simon.schulte@indecol.uni-freiburg.de).

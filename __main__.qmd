@@ -8,183 +8,159 @@ format: html
 ## Description
 
 This is the main script. 
-It runs the individual R scripts in the required order
+It runs the individual R scripts in the required order. 
 
 ## Packages
 
 ```{r}
-library(data.table)
-library(tidyverse)
-library(units)
-library(ggforce)
-
-library(countrycode)
-library(data.tree)
 library(callr)
-library(job)
 ```
 
 
+## Adjust config file
 
+
+1. Adjust the paths to the data file (the directory where you saved the data downloaded as indicated above)
+2. Adjust the number of cores to the characteristics of your computer (The more cores you use, (1) the faster the code runs, but also (2) the more RAM you require).
+
+```{r}
+file.edit('config.yml')
+```
+
+The version number determines where the intermediate results are stored. This means when you run the scripts the first time with a give version number a sub-folder under ./intermediate_results is created. Running the scripts again with the same version number overwrites the results.
 
 
 ## Execute Scripts
 
-### Create Correspondence Table
-
-```{r}
-rscript('0a_create_CT_CRF_classification.R')
+```{r} 
+rscript("0_prepare_CT.R")
 ```
 
-### Prepare Data
-
-```{r}
-rscript('1a_prepare_UNFCCC_CRF.R')
+```{r} 
+rscript("1a_create_CT_CRF_classification.R")
 ```
 
-```{r}
-rscript('1b_prepare_UNFCCC_uncertainty.R')
+```{r} 
+rscript("1b_prepare_UNFCCC_CRF.R")
 ```
 
-
-```{r}
-rscript('1c_repair_CRF_categories.R')
+```{r} 
+rscript("1c_prepare_UNFCCC_uncertainty.R")
 ```
 
-
-### Sample GHG extensions
-
-#### UNFCCC
-
-```{r}
-rscript('2a_merge_CRF_NIR_data.R')
+```{r} 
+rscript("1d_repair_CRF_categories.R")
 ```
 
-```{r}
-rscript('2b_sample_UNFCCC.R')
+```{r} 
+rscript("1e_merge_CRF_NIR_data.R")
 ```
 
-
-#### Edgar
-
-
-```{r}
-rscript('3a_parse_EDGAR_emissions.R')
+```{r} 
+rscript("1f_sample_UNFCCC.R")
 ```
 
-```{r}
-rscript('3b_parse_EDGAR_uncertainty.R')
+```{r} 
+rscript("2a_parse_EDGAR_emissions.R")
 ```
 
-```{r}
-rscript('3c_sample_EDGAR.R')
+```{r} 
+rscript("2b_parse_EDGAR_uncertainty.R")
 ```
 
-
-#### Residence Adjustment
-
-```{r}
-rscript('4a_residence_adjustment_SEA_prepare_data.R')
+```{r} 
+rscript("2c_sample_EDGAR.R")
 ```
 
-```{r}
-rscript('4b_residence_adjustment_SEA_sample.R')
+```{r} 
+rscript("3a_prepare_SUT_proxies.R")
 ```
 
-
-```{r}
-rscript('4c_residence_adjustment_AIR_prepare.R')
+```{r} 
+rscript("3b_prepare_PEFA_proxies.R")
 ```
 
-```{r}
-rscript('4d_residence_adjustment_AIR_sample.R')
+```{r} 
+rscript("3c_prepare_EMPLOYMENT_proxies.R")
 ```
 
-```{r}
+```{r} 
+rscript("3d_prepare_ROAD_TRANSPORT_proxies.R")
+```
+
+```{r} 
+rscript("4a_residence_adjustment_SEA_prepare_data.R")
+```
+
+```{r} 
+rscript("4b_residence_adjustment_SEA_sample.R")
+```
+
+```{r} 
+rscript("4c_residence_adjustment_AIR_prepare.R")
+```
+
+```{r} 
+rscript("4d_residence_adjustment_AIR_sample.R")
+```
+
+```{r} 
 rscript("4e_residence_adjustment_ROAD_prepare.R")
 ```
 
-here
+```{r} 
+rscript("5a_UNFCCC_get_EXIOBASE_proxies.R")
+```
 
-#### Prepare Proxies 
+```{r} 
+rscript("5b_EDGAR_get_proxies.R")
+```
 
+```{r} 
+rscript("6a_combine_UNFCCC_EDGAR_samples.R")
+```
 
-```{r}
-rscript('4a_prepare_SUT_proxies.R')
+```{r} 
+rscript("6b_residence_adjustment_ROAD_sample.R")
+```
+
+```{r} 
+rscript("6c_run_optimizer.R")
+```
+
+```{r} 
+rscript("6d_sample_EXIOBASE.R")
+```
+
+```{r} 
+rscript("6e_prepare_EXIOBASE_samples.R")
+```
+
+```{r} 
+rscript("6f_convert_to_matrix.R")
+```
+
+```{r} 
+rscript("7a_prepare_EXIOBASE.R")
+```
+
+```{r} 
+rscript("7b_prepare_oecd_AEA.R")
+```
+
+```{r} 
+rscript("8a_calculate_footprints.R")
+```
+
+```{r} 
+rscript("8b_prepare_footprints.R")
+```
+
+```{r} 
+rscript("9_plot_results.R")
 ```
 
 
-```{r}
-rscript('4b_prepare_PEFA_proxies.R')
-```
-
-
-
-```{r}
-rscript('prepare_EMPLOYMENT_proxies.R')
-```
-
-```{r}
-rscript('prepare_ROAD_TRANSPORT_proxies.R')
-```
-
-
-
-```{r}
-rscript('5a_UNFCCC_get_EXIOBASE_proxies.R')
-```
-
-```{r}
-rscript('6a_EDGAR_get_proxies.R')
-```
-
-
-#### Sample Extensions
-
-```{r}
-rscript("7_combine_UNFCCC_EDGAR_samples.R")
-```
-
-```{r}
-rscript("4f_residence_adjustment_ROAD_sample.R")
-```
-
-```{r}
-rscript("7b_run_optimizer.R")
-```
-
-```{r}
-rscript("5c_sample_EXIOBASE.R")
-```
-
-
-```{r}
-rscript("prepare_EXIOBASE_samples.R")
-```
-
-
-
-```{r}
-rscript("5d_convert_to_matrix.R")
-```
-
-```{r}
-rscript("prepare_EXIOBASE.R")
-```
-
-
-### Calculate Footprints (national/industry)
-
-```{r}
-rscript('6_calculate_footprints.R')
-```
-
-
-### Analyse results
-
-```{r}
-rscript('7a_analyse_extensions.R')
-```
 
 
 
