@@ -20,7 +20,7 @@ Earth Systems Science Data (ESSD).
 
 Once published the study will be linked here.
 
-# Getting started
+
 
 ```{r include=FALSE}
 path2project <- usethis::proj_get()

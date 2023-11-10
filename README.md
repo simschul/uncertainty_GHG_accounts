@@ -10,8 +10,6 @@ Earth Systems Science Data (ESSD).
 
 Once published the study will be linked here.
 
-# Getting started
-
 ## Data required
 
 To reproduce the results and run the scripts you need to download the
