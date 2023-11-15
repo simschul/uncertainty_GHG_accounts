@@ -74,5 +74,5 @@ The code was tested with the following setup:
     version.string R version 4.3.1 (2023-06-16)
     nickname       Beagle Scouts 
 
-In case of problems please raise an [issue](/issues) or [contact
+In case of problems, please raise an [issue](/issues) or [contact
 me](mailto:simon.schulte@indecol.uni-freiburg.de).

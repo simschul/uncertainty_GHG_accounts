@@ -417,6 +417,20 @@ full_by_ind <- full_by_ind[is.finite(cv) & cv >= 0]
 # # Combine plots
 # ggpubr::ggarrange(plotlist = plot_list, nrow = 1,align = 'h')
 
+
+# meta$industries[grepl("wind", Name)]
+# 
+# solar <- 'i40.11.h' # solar
+# wind <- 'i40.11.e' # wind
+# 
+# full_by_ind[EB_region == 'CN' & type ==  'FP']$industry_code %>% 
+#   unique
+# 
+# full_by_ind[industry_code == solar & EB_region == 'CN'] %>% 
+#   .[, .(EB_region, gas, type, round(mean *1E6, 2))]
+# 
+# gea_by_ind[industry_code == solar & EB_region == 'CN', 
+#            .(gas, mean, median, cv, value_exio)]
 ############################################################################## # 
 ##### Plots #############################################################
 ############################################################################## # 
@@ -454,7 +468,8 @@ ggplot(full_by_reg, aes(xmin = left, xmax = right, ymax = (CI97.5 / mean) - 1, y
                                 labels = c('GHG emission accounts', 'GHG footprints'))), 
              scales = 'free_y', space = 'fixed') + 
   ylab('% deviation from sample mean') + 
-  xlab('Share of total emissions') + 
+  xlab('Share of total emissions') +
+  coord_cartesian(ylim = c(-0.5, 0.5)) + 
   theme(legend.position = 'bottom', 
         #axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), 
         strip.background  = element_rect(fill = 'grey90', colour = NA))
@@ -462,6 +477,9 @@ ggplot(full_by_reg, aes(xmin = left, xmax = right, ymax = (CI97.5 / mean) - 1, y
 # __iii. Save ============================================================
 
 ggsave2(filename = "full_by_reg.pdf", height = 6, width = 7)
+
+
+
 
 
 # _b) GEA against other databases ==============================================
@@ -485,6 +503,11 @@ ggsave2(filename = "full_by_reg.pdf", height = 6, width = 7)
    theme(legend.position = 'bottom', legend.title = element_blank(), 
          axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
    xlab('Country / Region'))
+
+
+
+gea_by_reg[, var(cv), by = gas]
+
 
 # __iii. Save ============================================================
 
@@ -670,15 +693,16 @@ full_by_ind[!is.finite(mean_rel)]
 # __ii. plot ================================================================
 
 full_by_ind[mean_rel < 0]
+alpha <- 0.6
 
 ggplot(full_by_ind[mean_rel >= tol], 
        aes(y = cv, x = left + (right - left) / 2)) +
-  geom_rect(aes(xmin = left, xmax = right, fill = mean_rel, col = mean_rel), 
+  geom_rect(aes(xmin = left, xmax = right, fill = mean_rel),
             ymin = min(full_by_ind[mean_rel >= tol]$cv %>% log10), 
             ymax = max(full_by_ind[mean_rel >= tol]$cv %>% log10),  
             #col = my_cols[4], size = 0.2, fill = my_cols[4], 
-            col = NA, 
-            alpha = 0.4) + 
+             col = NA, 
+            alpha = alpha) + 
   geom_boxplot(aes(y = cv, x = -0.1), width = 0.1, inherit.aes = FALSE, 
                outlier.alpha = 0.3, outlier.colour = 'grey30', 
                outlier.shape = 16, outlier.size = 0.5) + 
@@ -691,11 +715,12 @@ ggplot(full_by_ind[mean_rel >= tol],
                                 labels = c('GHG emission accounts', 'GHG footprints')))) + 
   ylab('CV = SD / mean') + 
   xlab('cumulative share of total emissions [%]') +
-  scale_y_continuous(labels = scales::label_number(accuracy = 0.01), trans = 'log10' )+
+  scale_y_continuous(labels = scales::label_number(accuracy = 0.01), 
+                     trans = 'log10' )+
   #coord_flip() +
   #  scale_fill_viridis_c(direction=1L, trans = "log10") + 
-  scale_fill_viridis_c(direction=1L, alpha = 0.4) + 
-  scale_color_viridis_c(direction=1L, alpha = 0.4) + 
+  scale_fill_viridis_c(direction=1L, alpha = alpha) + 
+  scale_color_viridis_c(direction=1L, alpha = alpha) + 
   #scale_y_continuous(labels = scales::percent)+
   scale_x_continuous(labels = scales::percent)+
   scale_linetype_manual(name = "Legend", 
@@ -781,7 +806,7 @@ temp2[gas == 'CO2' & `$Q_{0.75}$` < 0, -'gas'] %>%
 #| fig-cap: "Devitaion from sample mean for individual coefficients. Sectors with a relative contribution of less than 0.00001% of total global emissions are not plotted since they show partly deviation of up to 3000%.."
 #| fig:height: 11 
 #| fig:width: 8
-setorder(gea_by_ind, gas, median)
+setorder(gea_by_ind, gas, mean)
 gea_by_ind[, right := cumsum(mean) / sum(mean), by = gas]
 gea_by_ind[, left := right - (mean / sum(mean)), by = .(gas)]
 # this one!
@@ -861,7 +886,7 @@ for (igas in c('CH4', 'CO2', 'N2O')) {
                             legend = 'bottom'))
 
 
-`# __iii. Save ============================================================
+# __iii. Save ============================================================
 
 ggsave2(plot = pfull, filename = "gea_by_ind_abs.pdf", height = 5, width = 7)
 
@@ -954,7 +979,7 @@ ggsave2(plot = pfull, filename = "gea_by_ind_rel.pdf", height = 5, width = 7)
 
 gea_by_ind[, dev_exio := (value_exio/mean)-1]
 
-setorder(gea_by_ind, gas, type, -dev_exio)
+setorder(gea_by_ind, gas, type)
 gea_by_ind[, right := cumsum(mean) / sum(mean), by = gas]
 gea_by_ind[, left := right - (mean / sum(mean)), by = .(gas)]
 
@@ -1024,7 +1049,7 @@ for (igas in c('CH4', 'CO2', 'N2O')) {
 
 # __iii. Save ============================================================
 
-ggsave2(plot = pfull, filename = "gea_by_ind_rel.pdf", height = 5, width = 7)
+#ggsave2(plot = pfull, filename = "gea_by_ind_rel.pdf", height = 5, width = 7)
 
 
 ############################################################################## # 

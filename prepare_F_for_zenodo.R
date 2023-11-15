@@ -80,7 +80,7 @@ indices_S$colnames <- merge(indices_S$colnames, meta$industries, by.x = 'sector'
 # samples
 f_list <- readRDS(file.path(path2output, 'convert_to_matrix.RData'))
 
-f_dt <- readRDS(file.path(path2output, 'prepare_EXIOBASE_samples_by_industry_and_CRF.RData'))
+f_dt <- read_feather(file.path(path2output, 'prepare_EXIOBASE_samples_by_industry_and_CRF.feather'))
 
 # convert mean + cv to matrix
 f_dt2 <- merge(f_dt, indices_S$colnames[, .(region, col, CodeNr)],
@@ -151,7 +151,7 @@ dt <- lapply(f_list, reshape_data) %>%
   rbindlist(idcol = 'run')
 dt[, run := as.integer(run)]
 
-dt <- merge(dt, F_rownames[, .(gas, row)], by.x = 'i', by.y = 'row', 
+dt <- merge(dt, F_rownames[, .(gas, id)], by.x = 'i', by.y = 'id', 
             sort = FALSE)
 dt2 <- dt[, list(value = sum(value)), by = .(run, j, gas)]
 
@@ -188,74 +188,74 @@ setnames(cormat_dt, 'value', 'pearson_correlation_coefficient')
 write_feather(cormat_dt, file.path(path2zenodo, 'correlation_table.feather'))
 
 
-cormat_dt[value < 0]
+# cormat_dt[value < 0]
 # plot
-cormat_dt[abs(value) > 0.25] %>% 
-  ggplot(aes( fill=gas, col = gas, x = value)) + 
-  geom_density(alpha = 0.4) + 
-  scale_fill_colorblind() + 
-  scale_color_colorblind()
+#cormat_dt[abs(value) > 0.25] %>% 
+  # ggplot(aes( fill=gas, col = gas, x = value)) + 
+  # geom_density(alpha = 0.4) + 
+  # scale_fill_colorblind() + 
+  # scale_color_colorblind()
 
 
 
-library(corrplot)
-corrplot.mixed(cormat[1:10, 1:10], upper = 'ellipse', order = 'AOE', 
-               lower = 'number')
+#library(corrplot)
+#corrplot.mixed(cormat[1:10, 1:10], upper = 'ellipse', order = 'AOE', 
+ #              lower = 'number')
 
 
 # trying out hdf5 ========================================================
 
-test_file <- tempfile(fileext=".h5")
-file.h5 <- H5File$new(test_file, mode="w")
-
-data(cars)
-file.h5$create_group("test")
-file.h5[["test/cars"]] <- cars
-cars_ds <- file.h5[["test/cars"]]
-h5attr(cars_ds, "rownames") <- rownames(cars)
-
-## Close the file at the end
-## the 'close' method closes only the file-id, but leaves object inside the file open
-## This may prevent re-opening of the file. 'close_all' closes the file and all objects in it
-file.h5$close_all()
+# test_file <- tempfile(fileext=".h5")
+# file.h5 <- H5File$new(test_file, mode="w")
+# 
+# data(cars)
+# file.h5$create_group("test")
+# file.h5[["test/cars"]] <- cars
+# cars_ds <- file.h5[["test/cars"]]
+# h5attr(cars_ds, "rownames") <- rownames(cars)
+# 
+# ## Close the file at the end
+# ## the 'close' method closes only the file-id, but leaves object inside the file open
+# ## This may prevent re-opening of the file. 'close_all' closes the file and all objects in it
+# file.h5$close_all()
 
 
 ############################################################################## # 
 ##### save results #############################################################
 ############################################################################## # 
-install.packages(
-  'hdf5r',
-  configure.args = '--with-hdf5=/home/simon/anaconda3/bin/h5cc'
-)
-
-install.packages(
-  'hdf5r',
-  configure.args = 'with-hdf5',
-  configure.vars = '[/home/linuxbrew/.linuxbrew/bin/h5cc]'
-)
-install.packages('hdf5r')
-if (!require("BiocManager", quietly = TRUE))
-  install.packages("BiocManager")
-
-BiocManager::install("rhdf5")
-Sys.getenv()
-install.packages("hdf5r", configure.args="--with-hdf5=/usr/local/hdf5/bin/h5cc")
-install.packages("hdf5r", configure.args="--with-hdf5=/usr/bin/h5cc")
-
-install_github(repo = 'hhoeflin/hdf5r')
-
-
-"/usr/lib/x86_64-linux-gnu/hdf5/serial/lib"
-"/usr/lib/x86_64-linux-gnu/hdf5"
-
-"/home/linuxbrew/.linuxbrew/Cellar/hdf5/1.14.2"
-
-system('which h5cc')
-
-/home/simon/anaconda3/bin/h5cc
-
-system('export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/hdf5/serial/libhdf5.so:/usr/lib/x86_64-linux-gnu/hdf5/serial/libhdf5_hl.so')
-
+# install.packages(
+#   'hdf5r',
+#   configure.args = '--with-hdf5=/home/simon/anaconda3/bin/h5cc'
+# )
+# 
+# install.packages(
+#   'hdf5r',
+#   configure.args = 'with-hdf5',
+#   configure.vars = '[/home/linuxbrew/.linuxbrew/bin/h5cc]'
+# )
+# install.packages('hdf5r')
+# if (!require("BiocManager", quietly = TRUE))
+#   install.packages("BiocManager")
+# 
+# BiocManager::install("rhdf5")
+# Sys.getenv()
+# install.packages("hdf5r", configure.args="--with-hdf5=/usr/local/hdf5/bin/h5cc")
+# install.packages("hdf5r", configure.args="--with-hdf5=/usr/bin/h5cc")
+# 
+# install_github(repo = 'hhoeflin/hdf5r')
+# 
+# 
+# "/usr/lib/x86_64-linux-gnu/hdf5/serial/lib"
+# "/usr/lib/x86_64-linux-gnu/hdf5"
+# 
+# "/home/linuxbrew/.linuxbrew/Cellar/hdf5/1.14.2"
+# 
+# system('which h5cc')
+# 
+# /home/simon/anaconda3/bin/h5cc
+# 
+# system('export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/hdf5/serial/libhdf5.so:/usr/lib/x86_64-linux-gnu/hdf5/serial/libhdf5_hl.so')
+# 
 
 # THE END ---------------------------------------------------------------------
 
