@@ -8,7 +8,8 @@ This is the code for reproducing the results for our study on
 Global Multi-Regional Input-Output analysis” submitted to the Journal of
 Earth Systems Science Data (ESSD).
 
-Once published the study will be linked here.
+The article is available as preprint here:
+<https://essd.copernicus.org/preprints/essd-2023-473/>
 
 ## Data required
 

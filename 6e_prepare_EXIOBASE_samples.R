@@ -50,7 +50,7 @@ theme_set(theme_bw())
 
 dt <- read_feather(file.path(path2output, 'sample_EXIOBASE_detailed.feather'))
 dt[, sample := as.list(sample)]
-
+dt[, country_code := as.character(country_code)]
 # map to EXIOBASE regions -----------------------------------------------------
 exio_regions <- fread(file.path(config$path2exiobaseIOT, 'unit.txt')) %>% 
   .$region %>% 
@@ -95,6 +95,42 @@ dt2 <- dt[, list(sample = (sum_samples(sample))),
 
 rm(dt)
 gc()
+
+# save .tex table with database information ====================================
+table <- dt2[database %in% c('edgar', 'unfccc'), .(EB_region, database)] %>% unique
+table <- table[!(EB_region == 'NL' & database == 'edgar')]
+table[, EB_region := factor(EB_region, levels = exio_regions)]
+setorder(table, EB_region)
+
+country_names <- rio::import(file.path('data', 'CountryMappingDESIRE.xlsx'), 
+                             which = 'DESIREregions') %>% 
+  as.data.table
+table <- merge(table, country_names[, .(`DESIRE code`, Name)], by.x = 'EB_region', 
+      by.y = 'DESIRE code', sort = FALSE)
+table[, database := toupper(database)]
+setnames(table, c('EB_region', 'database'), c("Country code", 'Database'))
+table <- table[, .(`Country code`, Name, Database)]
+
+
+path2plot <- file.path('figures', config$version)
+if(!dir.exists(path2plot)) dir.create(path2plot)
+
+
+save_results_xlsx(table, filename = 'EB_regions.xlsx')
+
+
+kableExtra::kbl(table, escape = FALSE, format = 'latex', 
+                booktabs = FALSE, 
+                toprule = '\\tophline', midrule = '\\middlehline', 
+                bottomrule = '\\bottomhline', linesep = '', vline = '',  
+                caption = "EXIOBASE v3 countries/regions and raw data source 
+                (EDGAR or UNFCCC inventories). The columns 'Country code' 
+                depict ISO 3166-1 alpha-2 codes, except the five Rest of the World (RoW) regions.", 
+                label = 'countries') %>% 
+  write(file = file.path(path2plot, 'table_EB_regions.tex'))
+
+
+
 
 # add broader category code ====================================================
 dt2[grepl('^1.A.1', category_code), category_code2 := '1.A.1']

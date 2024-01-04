@@ -119,6 +119,10 @@ colnames(Ymat_new) <- colnames_Y$region %>% unique
 
 S_ref <- calculate_S(F_ref, xvec)
 
+# begin
+
+
+
 # calculate multiplier
 fp_multiplier_ref <- S_ref %*% Lmat
 # calculate national footprints

@@ -75,6 +75,12 @@ rbind_matrices_as_sparse <- function(x) {
 F_samples <- readRDS(file.path(path2output, 'convert_to_matrix.RData'))
 xvec <- readRDS(file.path(path2output, 'prepare_EXIOBASE_x.RData'))
 
+
+# temp <- F_samples[[24]] %>% colSums()
+# v1 <- temp[xvec == 0] %>% sum
+# v2 <- temp %>% sum
+# v1/v2
+
 # calculate S
 S_samples <- lapply(F_samples, function(x) calculate_S(x, xvec))
 rm(F_samples)
@@ -83,6 +89,30 @@ length(S_samples)
 
 Ymat <- readRDS(file.path(path2output, 'prepare_EXIOBASE_Y.RData'))
 Lmat <- readRDS(file.path(path2output, 'prepare_EXIOBASE_L.RData'))
+
+# # begin
+# F_mean <- Reduce("+", F_samples) / length(F_samples)
+# F_new <- F_mean[12:22, ] %>% colSums()
+# S_new <- calculate_S(matrix(F_new, nrow = 1), xvec)
+# 
+# meta$industries[grepl('solar', Name)]
+# wind <- 'i40.11.e'
+# solar <- 'i40.11.h'
+# meta$indices_Y$rownames[, id := 1:.N]
+# 
+# ids_wind <- meta$indices_Y$rownames[grepl('photovoltaic', sector)]$id
+# 
+# Y_new <- matrix(0, nrow = 7987)
+# Y_new[ids_wind,] <- 1
+# 
+# data <- F_mean[12:22, ids_wind] %>% 
+#   melt %>% 
+#   as.data.table %>% 
+#   .[value > 0]
+# ggplot(data, aes(x = as.factor(Var1), y = value)) + 
+#   geom_boxplot()
+
+# end
 
 # Calculate Footprints ========================================================
 

@@ -57,6 +57,7 @@ setkey(inventory, database, year, country_code, #EXIOBASE_region_code,
 
 
 
+
 # load bridging data
 country_bridge <- read_feather(path2bridge)
 country_bridge[, year := as.character(year)]
