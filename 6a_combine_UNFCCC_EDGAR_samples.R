@@ -21,7 +21,7 @@ library(ggforce)
 ##### settings #################################################################
 ############################################################################## # 
 
-source('./src/functions.R')
+source(file.path('src', 'functions.R'))
 
 # read config and setup log script
 config <- setup_config_and_log()

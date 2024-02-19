@@ -18,14 +18,16 @@ library(units)
 library(ggforce)
 #library(my.utils)
 library(countrycode)
-library(mRio)
+# library(mRio)
 library(testthat)
 library(arrow)
 ############################################################################## # 
 ##### settings #################################################################
 ############################################################################## # 
 
-source('./src/functions.R')
+source(file.path('src', 'functions.R'))
+source(file.path('src', 'functions_mRio.R'))
+
 
 # read config and setup log script
 config <- setup_config_and_log()

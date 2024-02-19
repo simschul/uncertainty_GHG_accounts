@@ -17,12 +17,14 @@ library(tidyverse)
 library(units)
 library(ggforce)
 library(logr)
-library(mRio)
+#library(mRio)
 library(countrycode)
 ############################################################################## # 
 ##### settings #################################################################
 ############################################################################## # 
 source(file.path('src', 'functions.R'))
+source(file.path('src', 'functions_mRio.R'))
+
 # read config and setup log script
 config <- setup_config_and_log()
 path2output <- config$path2output

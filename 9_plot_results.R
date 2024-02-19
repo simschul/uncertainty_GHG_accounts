@@ -762,7 +762,8 @@ temp2 <- temp[, list(Median = median(reldif),
 
 setnames(temp2, c('Name', 'industry_code'), c("Industry name", 'Industry code'))
 
-temp2[nchar(`Industry name`) > 80, `Industry name` := paste0(strtrim(`Industry name`, 80), '...')]
+temp2[nchar(`Industry name`) > 80, 
+      `Industry name` := paste0(strtrim(`Industry name`, 80), '...')]
 
 temp2[gas == 'CO2' & `$Q_{0.25}$` > 0, -'gas'] %>% 
   setorder(-Median) %>% 

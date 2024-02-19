@@ -16,11 +16,12 @@ library(data.table)
 library(tidyverse)
 library(units)
 library(ggforce)
-library(mRio)
+# library(mRio)
 
 ############################################################################## # 
 ##### settings #################################################################
 ############################################################################## # 
+source(file.path('src', 'functions_mRio.R'))
 
 source(file.path('src', 'functions.R'))
 # read config and setup log script

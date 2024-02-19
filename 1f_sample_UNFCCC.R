@@ -76,6 +76,7 @@ dt <- merge(dt, dt_cvmean, by = c('gas', 'category_code'),
 #   theme_bw()
 
 # end workaround
+#dt <- dt[party == 'DEU' & year == '2015']
 
 
 

@@ -24,8 +24,8 @@ library(testthat)
 ##### functions #################################################################
 ############################################################################## # 
 
-source('./src/functions.R')
-source('./src/functions_dirichlet.R')
+source(file.path('src', 'functions.R'))
+source(file.path('src', 'functions_dirichlet.R'))
 
 #source('./src/functions_dirichlet2.R')
 

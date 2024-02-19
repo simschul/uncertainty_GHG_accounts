@@ -16,7 +16,7 @@ library(data.table)
 library(tidyverse)
 library(units)
 library(ggforce)
-library(mRio)
+# library(mRio)
 library(pbmcapply)
 library(testthat)
 library(svMisc)
@@ -28,6 +28,8 @@ library(pbapply)
 ############################################################################## # 
 
 source(file.path('src', 'functions.R'))
+source(file.path('src', 'functions_mRio.R'))
+
 # read config and setup log script
 config <- setup_config_and_log()
 path2output <- config$path2output

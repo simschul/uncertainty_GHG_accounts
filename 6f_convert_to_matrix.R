@@ -20,7 +20,7 @@ library(countrycode)
 library(ggthemes)
 library(ggrepel)
 library(logr)
-library(mRio)
+# library(mRio)
 library(arrow)
 
 ############################################################################## # 
@@ -28,6 +28,8 @@ library(arrow)
 ############################################################################## # 
 source(file.path('src', 'functions_plot.R'))
 source(file.path('src', 'functions.R'))
+source(file.path('src', 'functions_mRio.R'))
+
 
 # read config and setup log script
 config <- setup_config_and_log()
@@ -62,6 +64,7 @@ read_EB3_S_meta <- function(path) {
   return(list(colnames = colnames, rownames = rownames))
 
 }
+
 indices_S <- read_EB3_S_meta(file.path(config$path2exiobaseIOT, 'satellite', 'F.txt'))
 indices_S$colnames[, col := 1:.N]
 indices_S$rownames[, row := 1:.N]

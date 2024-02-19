@@ -1,5 +1,5 @@
 default:
-  version: 1.3
+  version: 1.4
   sample_size: 1000
   gases: ['CO2', 'CH4', 'N2O']
   year: '2015'
@@ -7,7 +7,7 @@ default:
   default_sampling: 'norm' # other options: exp
   default_cv: 0.3
   n_cores: 6 # number of cores (for multi-processing). set to one if you do want avoid multi processing
-  path2CT_CRF_EXIOBASE: './data/correspondence_CRFdetailed_to_NACE_EXIOBASE_edited_v3-4.xlsx'
+  path2CT_CRF_EXIOBASE: './data/correspondence_CRFdetailed_to_EXIOBASE_v3-5.xlsx'
   path2CT_CRF_EXIOBASE_parsed: '~/Documents/Projects/Uncertainty_Extensions/code/UNFCCC_CRF_correspondence_tables/intermediate_results/3_CT_coherent.RData'
   path2CT_CRF_EDGAR_parsed: '/home/simon/Documents/Projects/Uncertainty_Extensions/code/UNFCCC_CRF_correspondence_tables/intermediate_results/CT_EDGAR_parsed.RData'
   path2CT_EDGAR_EXIOBASE: './data/correspondence_EDGAR_to_EXIOBASE_edited_v4.xlsx'

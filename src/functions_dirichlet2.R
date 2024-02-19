@@ -25,24 +25,24 @@ eval_f2 <- function(x, prod_fun = prod) {
 # shares <- alpha
 
 
-fun <- function() print(environment())
-fun()
-shares <- testshares
-
-
-find_gamma_maxent2 <- function(shares, bounds = c(0.1, 1000)) {
-  my_prod <- make_prod_fun(length(shares), envir = environment())
-  fun_deriv <- Deriv(function(x) eval_f2(x, prod_fun = my_prod), 
-                     cache.exp = FALSE)
-  fun_deriv2 <- function(x) sapply(x, fun_deriv)
-  # f.lower <- fun_deriv2(bounds[1])
-  # f.upper <- fun_deriv2(bounds[2])
-  # 
-  # while(!is.finite(f.lower)) {
-  #   bounds[1] <- mean(bounds)
-  #   f.lower <- fun_deriv2(bounds[1])
-  # }
-  # while(!is.finite(f.upper)) {
-  #   bounds[2] <- mean(bounds)
-  #   f.upper <- fun_deriv2(bounds[2])
-   <- <- <- <- <- <- <- <- <- <- <- 
+# fun <- function() print(environment())
+# fun()
+# shares <- testshares
+# 
+# 
+# find_gamma_maxent2 <- function(shares, bounds = c(0.1, 1000)) {
+#   my_prod <- make_prod_fun(length(shares), envir = environment())
+#   fun_deriv <- Deriv(function(x) eval_f2(x, prod_fun = my_prod), 
+#                      cache.exp = FALSE)
+#   fun_deriv2 <- function(x) sapply(x, fun_deriv)
+#   # f.lower <- fun_deriv2(bounds[1])
+#   # f.upper <- fun_deriv2(bounds[2])
+#   # 
+#   # while(!is.finite(f.lower)) {
+#   #   bounds[1] <- mean(bounds)
+#   #   f.lower <- fun_deriv2(bounds[1])
+#   # }
+#   # while(!is.finite(f.upper)) {
+#   #   bounds[2] <- mean(bounds)
+#   #   f.upper <- fun_deriv2(bounds[2])
+#    <- <- <- <- <- <- <- <- <- <- <- 

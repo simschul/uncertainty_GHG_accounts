@@ -16,14 +16,16 @@ library(data.table)
 library(tidyverse)
 library(units)
 library(ggforce)
-library(mRio)
+# library(mRio)
 library(testthat)
 library(logr)
 
 ############################################################################## # 
 ##### settings #################################################################
 ############################################################################## # 
-source('./src/functions.R')
+source(file.path('src', 'functions.R'))
+source(file.path('src', 'functions_mRio.R'))
+
 
 # read config and setup log script
 config <- setup_config_and_log()
